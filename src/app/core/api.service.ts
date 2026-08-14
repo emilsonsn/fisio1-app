@@ -5,7 +5,7 @@ import { AccessGroup, ApiCollection, Assessment, ClinicalRecord, Evolution, Pati
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private readonly base = 'http://localhost:8000/api/v1';
+    private readonly base = 'https://fisio.tech:3001/api/v1';
   constructor(private readonly http: HttpClient) {}
   login(email: string, password: string) { return firstValueFrom(this.http.post<{data:{user:User;token:string}}>(`${this.base}/auth/login`, { email, password, device_name: 'fisio1-angular' })); }
   forgotPassword(email: string) { return firstValueFrom(this.http.post<{message:string}>(`${this.base}/auth/forgot-password`, { email })); }
