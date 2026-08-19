@@ -36,7 +36,20 @@ export class PatientsService {
     );
   }
   private form(payload: Partial<Patient>, photo?: File | null) {
-    const allowed = ['name', 'document', 'birth_date', 'phone', 'email', 'notes'] as const;
+    const allowed = [
+      'name',
+      'document',
+      'birth_date',
+      'phone',
+      'indication',
+      'birthplace',
+      'marital_status',
+      'gender',
+      'profession',
+      'address',
+      'email',
+      'notes',
+    ] as const;
     const sanitized = Object.fromEntries(allowed.map((key) => [key, payload[key]]));
     return toFormData(sanitized, photo ? [photo] : [], 'photo');
   }

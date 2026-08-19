@@ -27,7 +27,20 @@ export class PatientDialogComponent {
       const patient = this.patient();
       this.form = patient
         ? { ...patient }
-        : { name: '', document: '', birth_date: '', phone: '', email: '', notes: '' };
+        : {
+            name: '',
+            document: '',
+            birth_date: '',
+            phone: '',
+            indication: '',
+            birthplace: '',
+            marital_status: '',
+            gender: '',
+            profession: '',
+            address: '',
+            email: '',
+            notes: '',
+          };
       this.photo = null;
       this.preview.set('');
     });
@@ -41,6 +54,15 @@ export class PatientDialogComponent {
   existingPhoto() {
     const patient = this.patient();
     return patient ? this.photos.url('patient', patient.id, patient.has_photo) : '';
+  }
+  age() {
+    if (!this.form.birth_date) return null;
+    const birthDate = new Date(`${this.form.birth_date}T00:00:00`);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age >= 0 ? age : null;
   }
   async save() {
     await this.feedback.run(async () => {

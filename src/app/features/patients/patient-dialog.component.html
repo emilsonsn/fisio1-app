@@ -37,10 +37,44 @@
             [(ngModel)]="form.birth_date"
             required
           />
+          @if (age() !== null) {
+            <small class="muted">Idade atual: {{ age() }} anos</small>
+          }
         </div>
         <div class="form-group">
           <label>Telefone</label
           ><input class="form-control" name="phone" [(ngModel)]="form.phone" required />
+        </div>
+        <div class="form-group full">
+          <label>Indicação</label
+          ><input class="form-control" name="indication" [(ngModel)]="form.indication" />
+        </div>
+        <div class="form-group">
+          <label>Naturalidade</label
+          ><input class="form-control" name="birthplace" [(ngModel)]="form.birthplace" />
+        </div>
+        <div class="form-group">
+          <label>Estado civil</label
+          ><input class="form-control" name="marital-status" [(ngModel)]="form.marital_status" />
+        </div>
+        <div class="form-group">
+          <label>Gênero</label>
+          <select class="form-control" name="gender" [(ngModel)]="form.gender">
+            <option value="">Selecione</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Não binário">Não binário</option>
+            <option value="Outro">Outro</option>
+            <option value="Prefere não informar">Prefere não informar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Profissão</label
+          ><input class="form-control" name="profession" [(ngModel)]="form.profession" />
+        </div>
+        <div class="form-group full">
+          <label>Endereço</label
+          ><input class="form-control" name="address" [(ngModel)]="form.address" />
         </div>
         <div class="form-group">
           <label>E-mail</label
