@@ -2,15 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../api-url';
-import { ClinicalRecord } from '../models';
-
-export interface DashboardData {
-  active_patients: number;
-  initial_assessments: number;
-  records_this_month: number;
-  pending_records: number;
-  recent_records: ClinicalRecord[];
-}
+import { DashboardData } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {

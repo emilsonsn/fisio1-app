@@ -1,6 +1,7 @@
 # Arquitetura do frontend
 
 - `core/`: contratos e serviços singleton. Cada integração HTTP pertence ao seu domínio.
+- `core/models/`: contratos da API separados por entidade; o `index.ts` é somente a fachada pública de exportação.
 - `features/`: páginas e componentes específicos de cada funcionalidade.
 - `layout/`: shell autenticado e elementos compartilhados de navegação.
 - `shared/`: componentes visuais reutilizáveis sem regras de negócio.
