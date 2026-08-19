@@ -1,6 +1,7 @@
 export * from './access-group.model';
 export * from './api-collection.model';
 export * from './assessment.model';
+export * from './audit-log.model';
 export * from './clinical-ai-process.model';
 export * from './clinical-record.model';
 export * from './dashboard-data.model';

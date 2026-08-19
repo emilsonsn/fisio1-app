@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { administrationGuard, authGuard, guestGuard } from './core/auth/auth.guard';
+import { administrationGuard, auditGuard, authGuard, guestGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -57,6 +57,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/access-groups/access-groups-page.component').then(
             (module) => module.AccessGroupsPageComponent,
+          ),
+      },
+      {
+        path: 'audit',
+        canActivate: [auditGuard],
+        loadComponent: () =>
+          import('./features/audit-logs/audit-logs-page.component').then(
+            (module) => module.AuditLogsPageComponent,
           ),
       },
     ],

@@ -132,3 +132,312 @@ a.ghost-button,
     transform: rotate(360deg);
   }
 }
+
+.audit-total {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--primary);
+  background: var(--surface);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.audit-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(190px, 1fr) 150px 150px auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+}
+
+.audit-filters .form-group {
+  margin: 0;
+}
+
+.audit-filters .filter-select,
+.audit-filters .form-control {
+  width: 100%;
+}
+
+.audit-filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.audit-filter-actions button {
+  min-height: 43px;
+  white-space: nowrap;
+}
+
+.audit-table .panel-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.audit-date strong,
+.audit-date small,
+.audit-target,
+.audit-target-id,
+.audit-group {
+  display: block;
+}
+
+.audit-date small,
+.audit-target-id,
+.audit-group {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.audit-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 9px;
+  color: #0d6fa7;
+  background: var(--primary-soft);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.audit-event i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.audit-event[data-group='autenticacao'] {
+  color: #7052b8;
+  background: #f2edff;
+}
+
+.audit-event[data-group='usuarios'],
+.audit-event[data-group='grupos-e-permissoes'] {
+  color: #94640d;
+  background: #fff4d7;
+}
+
+.audit-event[data-group='avaliacoes'],
+.audit-event[data-group='evolucoes'],
+.audit-event[data-group='registros-clinicos'] {
+  color: #247a58;
+  background: #eaf8f1;
+}
+
+.audit-event[data-group='inteligencia-artificial'] {
+  color: #0a68a0;
+  background: #e9f7ff;
+}
+
+.audit-system-avatar {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-weight: 800;
+}
+
+.audit-detail-button {
+  min-width: 76px;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--primary);
+  background: var(--surface);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.audit-detail-button:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.55;
+}
+
+.audit-detail-row td {
+  padding: 0;
+  background: var(--surface-2);
+}
+
+.audit-detail {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-top: 2px solid var(--primary);
+}
+
+.audit-detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.audit-detail-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audit-detail-heading > div span {
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.audit-detail-heading small {
+  color: var(--muted);
+}
+
+.audit-change-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.audit-change-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.audit-change-card > strong {
+  grid-column: 1 / -1;
+  color: var(--ink);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.audit-value {
+  min-width: 0;
+  padding: 9px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.audit-value small,
+.audit-value span {
+  display: block;
+}
+
+.audit-value small {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.audit-value span {
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.audit-value.before span {
+  color: #a3454d;
+}
+
+.audit-value.after span {
+  color: #247a58;
+}
+
+.audit-arrow {
+  color: var(--muted);
+}
+
+.audit-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.audit-metadata span {
+  display: inline-flex;
+  gap: 5px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 9px;
+}
+
+.audit-metadata strong {
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.audit-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.audit-pagination span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.audit-pagination button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+[data-theme='dark'] .audit-event[data-group='autenticacao'] {
+  background: #2b2443;
+}
+
+[data-theme='dark'] .audit-event[data-group='usuarios'],
+[data-theme='dark'] .audit-event[data-group='grupos-e-permissoes'] {
+  background: #42351d;
+}
+
+[data-theme='dark'] .audit-event[data-group='avaliacoes'],
+[data-theme='dark'] .audit-event[data-group='evolucoes'],
+[data-theme='dark'] .audit-event[data-group='registros-clinicos'] {
+  background: #153e35;
+}
+
+@media (max-width: 1200px) {
+  .audit-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .audit-filter-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 760px) {
+  .audit-filters,
+  .audit-change-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-filter-actions {
+    justify-content: stretch;
+  }
+
+  .audit-filter-actions button {
+    flex: 1;
+  }
+}

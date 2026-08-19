@@ -21,3 +21,11 @@ export const administrationGuard: CanActivateFn = () => {
   const router = inject(Router);
   return auth.can('users.manage') ? true : router.createUrlTree(['/']);
 };
+
+export const auditGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.can('groups.manage') && auth.can('audit_logs.view')
+    ? true
+    : router.createUrlTree(['/']);
+};

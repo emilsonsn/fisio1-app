@@ -1,0 +1,192 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">SEGURANÇA E RASTREABILIDADE</span>
+    <h1>Auditoria do sistema</h1>
+    <p>Acompanhe acessos e alterações realizadas em todos os registros.</p>
+  </div>
+  <span class="audit-total">{{ total() }} eventos registrados</span>
+</section>
+
+<form class="panel audit-filters" (ngSubmit)="applyFilters()">
+  <div class="form-group">
+    <label>Categoria da ação</label>
+    <select class="filter-select" name="audit-event" [(ngModel)]="filters.event">
+      <option value="">Todas as categorias</option>
+      @for (event of options().events; track event.value) {
+        <option [value]="event.value">{{ event.group }} · {{ event.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Usuário responsável</label>
+    <select class="filter-select" name="audit-user" [(ngModel)]="filters.user_id">
+      <option [ngValue]="null">Todos os usuários</option>
+      @for (user of options().users; track user.id) {
+        <option [ngValue]="user.id">{{ user.name }}</option>
+      }
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Data inicial</label>
+    <input class="form-control" type="date" name="date-from" [(ngModel)]="filters.date_from" />
+  </div>
+  <div class="form-group">
+    <label>Data final</label>
+    <input class="form-control" type="date" name="date-to" [(ngModel)]="filters.date_to" />
+  </div>
+  <div class="audit-filter-actions">
+    <button type="button" class="secondary-button" (click)="clearFilters()">Limpar</button>
+    <button class="primary-button">Aplicar filtros</button>
+  </div>
+</form>
+
+<section class="panel data-table audit-table">
+  <div class="panel-header">
+    <div>
+      <h3>Histórico de atividades</h3>
+      <small>Os eventos são permanentes e não podem ser editados ou excluídos.</small>
+    </div>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>DATA E HORA</th>
+          <th>EVENTO</th>
+          <th>REALIZADO POR</th>
+          <th>REGISTRO</th>
+          <th>DETALHES</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of logs(); track log.id) {
+          <tr>
+            <td class="audit-date">
+              <strong>{{ log.created_at | date: 'dd/MM/yyyy' }}</strong>
+              <small>{{ log.created_at | date: 'HH:mm:ss' }}</small>
+            </td>
+            <td>
+              <span class="audit-event" [attr.data-group]="eventClass(log)">
+                <i></i>{{ log.event_label }}
+              </span>
+              <small class="audit-group">{{ log.event_group }}</small>
+            </td>
+            <td>
+              @if (log.user; as user) {
+                <div class="person-cell">
+                  @if (user.id !== null) {
+                    <app-avatar
+                      type="user"
+                      [id]="user.id"
+                      [name]="user.name"
+                      [hasPhoto]="user.has_photo"
+                    />
+                  } @else {
+                    <span class="audit-system-avatar">{{ user.name.charAt(0) }}</span>
+                  }
+                  <div>
+                    <strong>{{ user.name }}</strong>
+                    <small>{{ user.email }}</small>
+                  </div>
+                </div>
+              } @else {
+                <div class="person-cell">
+                  <span class="audit-system-avatar">S</span>
+                  <div><strong>Sistema/visitante</strong><small>Ação sem autenticação</small></div>
+                </div>
+              }
+            </td>
+            <td>
+              @if (log.auditable; as auditable) {
+                <strong class="audit-target">{{ auditable.label || auditable.type }}</strong>
+                <small class="audit-target-id">{{ auditable.type }} #{{ auditable.id }}</small>
+              } @else {
+                <span class="muted">Sem registro vinculado</span>
+              }
+            </td>
+            <td>
+              <button
+                class="audit-detail-button"
+                type="button"
+                [disabled]="!hasDetails(log)"
+                (click)="toggleDetails(log)"
+              >
+                {{ expandedId() === log.id ? 'Ocultar' : 'Visualizar' }}
+              </button>
+            </td>
+          </tr>
+          @if (expandedId() === log.id) {
+            <tr class="audit-detail-row">
+              <td colspan="5">
+                <div class="audit-detail">
+                  @if (changedFields(log).length) {
+                    <div class="audit-detail-heading">
+                      <div><span>↔</span><strong>Campos registrados</strong></div>
+                      <small>{{ changedFields(log).length }} campo(s)</small>
+                    </div>
+                    <div class="audit-change-grid">
+                      @for (field of changedFields(log); track field.key) {
+                        <article class="audit-change-card">
+                          <strong>{{ fieldLabel(field.key) }}</strong>
+                          <div class="audit-value before">
+                            <small>ANTES</small><span>{{ formatValue(field.before) }}</span>
+                          </div>
+                          <span class="audit-arrow">→</span>
+                          <div class="audit-value after">
+                            <small>DEPOIS</small><span>{{ formatValue(field.after) }}</span>
+                          </div>
+                        </article>
+                      }
+                    </div>
+                  }
+                  @if (metadata(log).length || log.ip_address) {
+                    <div class="audit-metadata">
+                      @if (log.ip_address) {
+                        <span><strong>IP</strong>{{ log.ip_address }}</span>
+                      }
+                      @for (item of metadata(log); track item[0]) {
+                        <span
+                          ><strong>{{ fieldLabel(item[0]) }}</strong
+                          >{{ formatValue(item[1]) }}</span
+                        >
+                      }
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <span>◫</span>
+                <h3>Nenhum evento encontrado</h3>
+                <p>Ajuste os filtros para consultar outro período.</p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (lastPage() > 1) {
+    <div class="audit-pagination">
+      <button
+        class="secondary-button"
+        [disabled]="currentPage() === 1"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        ← Anterior
+      </button>
+      <span>Página {{ currentPage() }} de {{ lastPage() }}</span>
+      <button
+        class="secondary-button"
+        [disabled]="currentPage() === lastPage()"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        Próxima →
+      </button>
+    </div>
+  }
+</section>

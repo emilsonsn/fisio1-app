@@ -17,13 +17,23 @@
       ><a class="nav-link" routerLink="/records" routerLinkActive="active"
         ><span>▤</span>Avaliações e evoluções</a
       >
-      @if (can('users.manage')) {
-        <small>ADMINISTRAÇÃO</small
-        ><a class="nav-link" routerLink="/user" routerLinkActive="active"
-          ><span>♙</span>Usuários e permissões</a
-        ><a class="nav-link" routerLink="/groups" routerLinkActive="active"
-          ><span>⚿</span>Grupos e permissões</a
-        >
+      @if (can('users.manage') || can('groups.view') || can('audit_logs.view')) {
+        <small>ADMINISTRAÇÃO</small>
+        @if (can('users.manage')) {
+          <a class="nav-link" routerLink="/user" routerLinkActive="active"
+            ><span>♙</span>Usuários e permissões</a
+          >
+        }
+        @if (can('groups.view')) {
+          <a class="nav-link" routerLink="/groups" routerLinkActive="active"
+            ><span>⚿</span>Grupos e permissões</a
+          >
+        }
+        @if (can('groups.manage') && can('audit_logs.view')) {
+          <a class="nav-link" routerLink="/audit" routerLinkActive="active"
+            ><span>◫</span>Auditoria</a
+          >
+        }
       }
     </nav>
     <div class="sidebar-insight">

@@ -49,6 +49,7 @@ export class AppShellComponent implements OnInit {
           '/new-record': 'Novo registro',
           '/user': 'Usuários',
           '/groups': 'Grupos e permissões',
+          '/audit': 'Auditoria',
         } as Record<string, string>
       )[this.router.url.split('?')[0]] ?? 'Fisio1'
     );
