@@ -1,0 +1,42 @@
+<div class="modal-backdrop">
+  <div class="modal record-detail-modal">
+    <button class="modal-close" (click)="closed.emit()">×</button
+    ><span class="record-type" [class.evolution]="type() === 'evolution'">{{
+      type() === 'evolution' ? 'Evolução' : 'Avaliação inicial'
+    }}</span>
+    <h2>{{ record().patient.name }}</h2>
+    <p>{{ date() }} · {{ record().professional.name }}</p>
+    <div class="info-list record-details">
+      @for (field of fields(); track field[0]) {
+        @if (field[1] !== null && field[1] !== '') {
+          <div>
+            <small>{{ field[0] }}</small
+            ><strong>{{ field[1] }}</strong>
+          </div>
+        }
+      }
+    </div>
+    <div class="record-attachments">
+      <div class="panel-header">
+        <div>
+          <h3>Anexos</h3>
+          <small>Arquivos vinculados a este registro</small>
+        </div>
+        <label class="upload-label"
+          >⇧ Adicionar arquivos<input type="file" multiple (change)="addFiles($event)"
+        /></label>
+      </div>
+      <div class="attachment-list">
+        @for (attachment of record().attachments; track attachment.id) {
+          <span class="attachment-chip"
+            ><button type="button" (click)="download(attachment.id, attachment.name)">
+              ⌕ {{ attachment.name }}</button
+            ><button type="button" (click)="remove(attachment.id)">×</button></span
+          >
+        } @empty {
+          <p class="muted">Nenhum anexo neste registro.</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

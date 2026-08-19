@@ -1,0 +1,39 @@
+<section class="panel recorder" [class.recording]="recording()">
+  <span class="eyebrow"
+    >{{ type() === 'evolution' ? 'EVOLUÇÃO' : 'AVALIAÇÃO INICIAL' }} • {{ patientName() }}</span
+  >
+  <h2>Conte como foi o atendimento</h2>
+  <p class="recorder-subtitle">
+    Fale naturalmente. Você poderá revisar tudo quando o processamento terminar.
+  </p>
+  <div class="record-orbit">
+    <button class="record-button" type="button" (click)="toggle()">
+      <span>●</span><small>{{ recording() ? 'PARAR' : 'GRAVAR' }}</small>
+    </button>
+  </div>
+  <div class="record-timer">{{ time() }}</div>
+  <div class="waveform">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track i) {
+      <i></i>
+    }
+  </div>
+  <p class="record-hint">
+    {{
+      recording()
+        ? 'Gravando…'
+        : ready()
+          ? 'Áudio pronto para processar.'
+          : 'Clique para iniciar a gravação.'
+    }}
+  </p>
+  <div class="upload-divider">ou</div>
+  <label class="upload-label"
+    >⇧ Enviar arquivo de áudio<input type="file" accept="audio/*" (change)="select($event)"
+  /></label>
+  <div class="form-actions">
+    <button class="secondary-button" (click)="back.emit()">Voltar</button
+    ><button class="primary-button" [class.hidden]="!ready()" (click)="submit()">
+      ✦ Processar com IA
+    </button>
+  </div>
+</section>

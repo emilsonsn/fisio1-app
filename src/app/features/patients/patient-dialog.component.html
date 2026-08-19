@@ -1,0 +1,62 @@
+<div class="modal-backdrop">
+  <div class="modal">
+    <button class="modal-close" (click)="closed.emit()">×</button>
+    <h2>{{ patient() ? 'Editar paciente' : 'Cadastrar paciente' }}</h2>
+    <p>Preencha os dados básicos de identificação e contato.</p>
+    <form (ngSubmit)="save()">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Foto do paciente</label
+          ><label class="upload-label"
+            >⇧ {{ photo?.name ?? 'Selecionar foto (JPG, PNG ou WEBP, até 5 MB)'
+            }}<input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onPhoto($event)"
+          /></label>
+          @if (preview() || existingPhoto()) {
+            <div class="photo-preview">
+              <img [src]="preview() || existingPhoto()" alt="Prévia da foto do paciente" />
+            </div>
+          }
+        </div>
+        <div class="form-group full">
+          <label>Nome completo</label
+          ><input class="form-control" name="name" [(ngModel)]="form.name" required />
+        </div>
+        <div class="form-group">
+          <label>CPF / documento</label
+          ><input class="form-control" name="document" [(ngModel)]="form.document" required />
+        </div>
+        <div class="form-group">
+          <label>Data de nascimento</label
+          ><input
+            class="form-control"
+            name="birth"
+            type="date"
+            [(ngModel)]="form.birth_date"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Telefone</label
+          ><input class="form-control" name="phone" [(ngModel)]="form.phone" required />
+        </div>
+        <div class="form-group">
+          <label>E-mail</label
+          ><input class="form-control" name="email" type="email" [(ngModel)]="form.email" />
+        </div>
+        <div class="form-group full">
+          <label>Observações</label
+          ><textarea class="form-control" name="notes" [(ngModel)]="form.notes"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="closed.emit()">Cancelar</button
+        ><button class="primary-button">
+          {{ patient() ? 'Salvar alterações' : 'Cadastrar paciente' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

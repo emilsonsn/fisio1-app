@@ -1,0 +1,71 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">CONTROLE DE ACESSO</span>
+    <h1>Grupos e permissões</h1>
+    <p>Defina o acesso de cada grupo e ajuste as permissões quando necessário.</p>
+  </div>
+</section>
+<section class="split">
+  <form class="panel form-card" (ngSubmit)="save()">
+    <h2>{{ editing() ? 'Editar grupo' : 'Novo grupo' }}</h2>
+    <p>
+      {{
+        editing()
+          ? 'Atualize os dados e confirme as permissões.'
+          : 'Selecione as permissões que este grupo poderá usar.'
+      }}
+    </p>
+    <div class="form-group">
+      <label>Nome</label
+      ><input class="form-control" name="group-name" [(ngModel)]="form.name" required />
+    </div>
+    <div class="form-group">
+      <label>Descrição</label
+      ><textarea
+        class="form-control"
+        name="group-description"
+        [(ngModel)]="form.description"
+      ></textarea>
+    </div>
+    <div class="form-group">
+      <label>Permissões</label>
+      <div class="permission-picker">
+        @for (permission of permissions(); track permission.id) {
+          <label class="check-label"
+            ><input
+              type="checkbox"
+              [checked]="form.permission_ids.includes(permission.id)"
+              (change)="togglePermission(permission.id)"
+            /><span>{{ permission.name }}</span
+            ><small>{{ permission.module }} · {{ permission.description }}</small></label
+          >
+        }
+      </div>
+    </div>
+    <div class="form-actions">
+      @if (editing()) {
+        <button type="button" class="secondary-button" (click)="cancel()">Cancelar</button>
+      }
+      <button class="primary-button">{{ editing() ? 'Salvar alterações' : 'Criar grupo' }}</button>
+    </div>
+  </form>
+  <div class="group-list">
+    @for (group of groups(); track group.id) {
+      <article class="panel group-card">
+        <div>
+          <span class="group-icon">⚿</span>
+          <div>
+            <h3>{{ group.name }}</h3>
+            <p>{{ group.description || 'Sem descrição' }}</p>
+          </div>
+        </div>
+        <div>
+          <span class="status">{{ group.permissions.length }} permissões</span>
+          @if (!group.is_system) {
+            <button class="ghost-button" (click)="edit(group)">Editar</button>
+          }
+        </div>
+      </article>
+    }
+  </div>
+</section>

@@ -1,0 +1,80 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">CONTROLE DE ACESSO</span>
+    <h1>Usuários e permissões</h1>
+    <p>Edite dados, grupos de acesso e o status de cada colaborador.</p>
+  </div>
+  <button class="primary-button" (click)="open()">＋ Novo usuário</button>
+</section>
+<section class="content-grid">
+  <div class="panel data-table">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>USUÁRIO</th>
+            <th>GRUPOS</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>
+                <div class="person-cell">
+                  <app-avatar
+                    type="user"
+                    [id]="user.id"
+                    [name]="user.name"
+                    [hasPhoto]="user.has_photo"
+                  />
+                  <div>
+                    <strong>{{ user.name }}</strong
+                    ><small>{{ user.email }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="permissions">
+                  @for (group of user.access_groups; track group.id) {
+                    <span class="permission">{{ group.name }}</span>
+                  } @empty {
+                    <span class="muted">Sem grupo</span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="status" [class.inactive]="!user.is_active">{{
+                  user.is_active ? 'Ativo' : 'Inativo'
+                }}</span>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <button (click)="open(user)">✎</button
+                  ><button (click)="toggle(user)">{{ user.is_active ? '⊘' : '✓' }}</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="panel">
+    <div class="panel-header"><h3>Como funciona</h3></div>
+    <div class="panel-body">
+      <div class="role-card">
+        <div>
+          <strong>Grupos controlam acesso</strong>
+          <p>Um usuário pode pertencer a vários grupos e acumular suas permissões.</p>
+        </div>
+        <span class="status">RBAC</span>
+      </div>
+      <p class="muted">Use editar para alterar dados, senha ou grupos sem recriar o usuário.</p>
+    </div>
+  </aside>
+</section>
+@if (dialogOpen()) {
+  <app-user-dialog [user]="editing()" [groups]="groups()" (closed)="close()" (saved)="saved()" />
+}

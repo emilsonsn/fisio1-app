@@ -1,0 +1,70 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">SEGUNDA-FEIRA, 03 DE AGOSTO</span>
+    <h1>Olá, {{ firstName() }}! 👋</h1>
+    <p>Acompanhe o que está acontecendo na clínica hoje.</p>
+  </div>
+  <div class="heading-actions">
+    <a class="secondary-button" routerLink="/patients">＋ Novo paciente</a
+    ><a class="primary-button" routerLink="/new-record">◉ Iniciar registro</a>
+  </div>
+</section>
+<section class="dashboard-grid">
+  <article class="stat-card">
+    <div class="stat-card-head"><span>Pacientes ativos</span><span class="stat-icon">♧</span></div>
+    <strong>{{ dashboard.data().active_patients }}</strong
+    ><span class="trend">+2 neste mês</span>
+  </article>
+  <article class="stat-card">
+    <div class="stat-card-head">
+      <span>Avaliações iniciais</span><span class="stat-icon">▤</span>
+    </div>
+    <strong>{{ dashboard.data().initial_assessments }}</strong
+    ><span class="trend">Histórico organizado</span>
+  </article>
+  <article class="stat-card">
+    <div class="stat-card-head"><span>Evoluções no mês</span><span class="stat-icon">↗</span></div>
+    <strong>{{ dashboard.data().records_this_month }}</strong
+    ><span class="trend">Registros deste mês</span>
+  </article>
+  <article class="stat-card">
+    <div class="stat-card-head">
+      <span>Registros pendentes</span><span class="stat-icon">◷</span>
+    </div>
+    <strong>{{ dashboard.data().pending_records }}</strong
+    ><span class="trend neutral">Revisar conteúdo da IA</span>
+  </article>
+</section>
+<section class="content-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>Atividade recente</h3>
+        <small>Últimos registros clínicos</small>
+      </div>
+      <a class="ghost-button" routerLink="/records">Ver todos →</a>
+    </div>
+    <div class="panel-body activity-list">
+      @for (r of dashboard.data().recent_records; track r.id) {
+        <div class="activity-item">
+          <span class="activity-icon">{{ r.type === 'evolution' ? '↗' : '▤' }}</span>
+          <div>
+            <strong>{{ r.patient.name }}</strong>
+            <p>{{ r.professional.name }} · {{ r.performed_at }}</p>
+          </div>
+          <span class="record-type" [class.evolution]="r.type === 'evolution'">{{
+            r.type === 'evolution' ? 'Evolução' : 'Avaliação inicial'
+          }}</span>
+        </div>
+      } @empty {
+        <p class="muted">Nenhum registro clínico.</p>
+      }
+    </div>
+  </div>
+  <div class="panel quick-record">
+    <span>✦ RECURSO INTELIGENTE</span>
+    <h3>Registre uma sessão usando sua voz</h3>
+    <p>Grave naturalmente. A IA transcreve e organiza o conteúdo para sua revisão.</p>
+    <a class="secondary-button" routerLink="/new-record">◉ Iniciar gravação</a>
+  </div>
+</section>

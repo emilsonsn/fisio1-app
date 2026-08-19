@@ -1,0 +1,74 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">GESTÃO CLÍNICA</span>
+    <h1>Pacientes</h1>
+    <p>Cadastre e acompanhe o histórico de cada paciente.</p>
+  </div>
+  <button class="primary-button" (click)="create()">＋ Novo paciente</button>
+</section>
+<div class="toolbar">
+  <div class="input-wrap">
+    <span>⌕</span
+    ><input
+      #query
+      placeholder="Buscar por nome, documento ou telefone"
+      (input)="search(query.value)"
+    />
+  </div>
+</div>
+<section class="panel data-table">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>PACIENTE</th>
+          <th>CONTATO</th>
+          <th>REGISTROS</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (patient of patients(); track patient.id) {
+          <tr>
+            <td>
+              <div class="person-cell">
+                <app-avatar
+                  [id]="patient.id"
+                  [name]="patient.name"
+                  [hasPhoto]="patient.has_photo"
+                />
+                <div>
+                  <strong>{{ patient.name }}</strong
+                  ><small>{{ patient.document }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {{ patient.phone }}<br /><small class="muted">{{ patient.email }}</small>
+            </td>
+            <td>{{ patient.clinical_records_count ?? 0 }}</td>
+            <td>
+              <div class="table-actions">
+                <button (click)="edit(patient)">✎</button><button (click)="pdf(patient)">⇩</button
+                ><a [routerLink]="['/new-record']" [queryParams]="{ patient: patient.id }">◉</a>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <span>♧</span>
+                <h3>Nenhum paciente encontrado</h3>
+                <p>Tente ajustar o termo da busca.</p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+@if (dialogOpen()) {
+  <app-patient-dialog [patient]="editing()" (closed)="close()" (saved)="saved()" />
+}

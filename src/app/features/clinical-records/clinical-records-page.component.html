@@ -1,0 +1,104 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">HISTÓRICO CLÍNICO</span>
+    <h1>Avaliações e evoluções</h1>
+    <p>Consulte os registros organizados por paciente.</p>
+  </div>
+  <button class="primary-button" (click)="router.navigateByUrl('/new-record')">
+    ◉ Iniciar avaliação
+  </button>
+</section>
+<div class="toolbar">
+  <div class="input-wrap">
+    <span>⌕</span><input placeholder="Buscar paciente" [(ngModel)]="search" />
+  </div>
+  <select class="filter-select" [(ngModel)]="typeFilter">
+    <option value="all">Todos os registros</option>
+    <option value="initial_assessment">Avaliações iniciais</option>
+    <option value="evolution">Evoluções</option>
+  </select>
+</div>
+<section class="panel data-table">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>PACIENTE</th>
+          <th>TIPO</th>
+          <th>DATA</th>
+          <th>PROFISSIONAL</th>
+          <th>STATUS</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.type + '-' + row.id) {
+          <tr>
+            <td>
+              <div class="person-cell">
+                <app-avatar
+                  [id]="row.patient.id"
+                  [name]="row.patient.name"
+                  [hasPhoto]="row.patient.has_photo"
+                /><strong>{{ row.patient.name }}</strong>
+              </div>
+            </td>
+            <td>
+              <span class="record-type" [class.evolution]="row.type === 'evolution'">{{
+                row.type === 'evolution' ? 'Evolução' : 'Avaliação inicial'
+              }}</span>
+            </td>
+            <td>{{ row.performedAt }}</td>
+            <td>{{ row.professional.name }}</td>
+            <td>
+              <span
+                class="status-pill"
+                [class.processing]="row.status === 'pending'"
+                [class.review]="row.status === 'in_review'"
+                [class.failed]="row.status === 'failed'"
+              >
+                @if (row.status === 'pending') {
+                  <i class="inline-spinner"></i>
+                }
+                {{ statusLabel(row.status) }}
+                @if (row.status === 'pending' && row.process?.chunks_count) {
+                  <small>{{ row.process?.processed_chunks }}/{{ row.process?.chunks_count }}</small>
+                }
+              </span>
+            </td>
+            <td>
+              <div class="table-actions">
+                @if (row.status === 'in_review') {
+                  <button class="review-action" (click)="review(row)">Revisar</button>
+                } @else if (row.status === 'failed' && row.process) {
+                  <button class="retry-action" (click)="retry(row.process.id)">↻</button>
+                } @else if (row.status === 'completed') {
+                  <button (click)="open(row)">›</button>
+                } @else {
+                  <button disabled><i class="inline-spinner"></i></button>
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <span>▤</span>
+                <h3>Nenhum registro encontrado</h3>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+@if (selected()) {
+  <app-clinical-record-dialog
+    [record]="selected()!"
+    [type]="selectedType()"
+    (closed)="selected.set(null)"
+    (changed)="detailChanged()"
+  />
+}

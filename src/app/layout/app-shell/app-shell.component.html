@@ -1,0 +1,70 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><img src="logo.png" alt="Fisio1" /></div>
+    <nav class="main-nav">
+      <small>VISÃO GERAL</small
+      ><a
+        class="nav-link"
+        routerLink="/"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        ><span>⌂</span>Início</a
+      ><a class="nav-link" routerLink="/patients" routerLinkActive="active"
+        ><span>♧</span>Pacientes <b>{{ dashboard.data().active_patients }}</b></a
+      ><small>ATENDIMENTO</small
+      ><a class="nav-link" routerLink="/new-record" routerLinkActive="active"
+        ><span>◉</span>Novo registro</a
+      ><a class="nav-link" routerLink="/records" routerLinkActive="active"
+        ><span>▤</span>Avaliações e evoluções</a
+      >
+      @if (can('users.manage')) {
+        <small>ADMINISTRAÇÃO</small
+        ><a class="nav-link" routerLink="/user" routerLinkActive="active"
+          ><span>♙</span>Usuários e permissões</a
+        ><a class="nav-link" routerLink="/groups" routerLinkActive="active"
+          ><span>⚿</span>Grupos e permissões</a
+        >
+      }
+    </nav>
+    <div class="sidebar-insight">
+      <span>✦</span><strong>Registre por voz</strong>
+      <p>Transforme o atendimento em um registro organizado.</p>
+      <a routerLink="/new-record">Começar agora →</a>
+    </div>
+    <div class="sidebar-footer">
+      @if (auth.user(); as user) {
+        <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
+        <div>
+          <strong>{{ user.name }}</strong
+          ><small>{{ groupNames() }}</small>
+        </div>
+      }
+      <button (click)="logout()">↪</button>
+    </div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span>Visão geral</span><strong>{{ title() }}</strong>
+      </div>
+      <div class="topbar-actions">
+        <button class="search-button" (click)="searchOpen.set(true)">
+          <span>⌕</span><span>Buscar paciente...</span><kbd>⌘ K</kbd></button
+        ><button
+          class="theme-toggle"
+          [attr.aria-label]="theme.dark() ? 'Usar tema claro' : 'Usar tema escuro'"
+          (click)="theme.toggle()"
+        >
+          {{ theme.dark() ? '☾' : '☼' }}
+        </button>
+        @if (auth.user(); as user) {
+          <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
+        }
+      </div>
+    </header>
+    <div class="view-container"><router-outlet /></div>
+  </main>
+</div>
+@if (searchOpen()) {
+  <app-patient-search-dialog (closed)="searchOpen.set(false)" />
+}

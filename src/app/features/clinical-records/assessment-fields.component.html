@@ -1,0 +1,110 @@
+<div class="form-grid">
+  <div class="form-group full">
+    <label>Indicação</label
+    ><input class="form-control" name="indication" [(ngModel)]="form.indication" />
+  </div>
+  <div class="form-group">
+    <label>Naturalidade</label
+    ><input class="form-control" name="birthplace" [(ngModel)]="form.birthplace" />
+  </div>
+  <div class="form-group">
+    <label>Estado civil</label
+    ><input class="form-control" name="marital-status" [(ngModel)]="form.marital_status" />
+  </div>
+  <div class="form-group">
+    <label>Gênero</label><input class="form-control" name="gender" [(ngModel)]="form.gender" />
+  </div>
+  <div class="form-group">
+    <label>Profissão</label
+    ><input class="form-control" name="profession" [(ngModel)]="form.profession" />
+  </div>
+  <div class="form-group full">
+    <label>Endereço</label><input class="form-control" name="address" [(ngModel)]="form.address" />
+  </div>
+  <div class="form-group full">
+    <label>Queixa principal</label
+    ><textarea class="form-control" name="chief" [(ngModel)]="form.chief_complaint"></textarea>
+  </div>
+  <div class="form-group full">
+    <label>História pregressa e atual da doença</label
+    ><textarea class="form-control" name="history" [(ngModel)]="form.condition_history"></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Hábitos de vida</label
+    ><textarea class="form-control" name="habits" [(ngModel)]="form.life_habits"></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Antecedentes pessoais e familiares</label
+    ><textarea
+      class="form-control"
+      name="background"
+      [(ngModel)]="form.personal_family_history"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Tratamentos realizados</label
+    ><textarea
+      class="form-control"
+      name="treatments"
+      [(ngModel)]="form.previous_treatments"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Exame físico</label
+    ><textarea
+      class="form-control"
+      name="physical"
+      [(ngModel)]="form.physical_examination"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Exames complementares</label
+    ><textarea class="form-control" name="exams" [(ngModel)]="form.complementary_exams"></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Diagnóstico fisioterapêutico</label
+    ><textarea
+      class="form-control"
+      name="diagnosis"
+      [(ngModel)]="form.physical_therapy_diagnosis"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>CBDF</label
+    ><textarea class="form-control" name="cbdf" [(ngModel)]="form.cbdf"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Quantidade de atendimentos</label
+    ><input
+      class="form-control"
+      type="number"
+      min="1"
+      name="sessions"
+      [(ngModel)]="form.planned_sessions"
+    />
+  </div>
+  <div class="form-group full">
+    <label>Recursos, métodos e técnicas</label
+    ><textarea
+      class="form-control"
+      name="resources"
+      [(ngModel)]="form.resources_methods_techniques"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Objetivos terapêuticos</label
+    ><textarea
+      class="form-control"
+      name="objectives"
+      [(ngModel)]="form.therapeutic_objectives"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Prognóstico fisioterapêutico</label
+    ><textarea
+      class="form-control"
+      name="prognosis"
+      [(ngModel)]="form.physical_therapy_prognosis"
+    ></textarea>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<section class="auth-shell">
+  <div class="auth-art">
+    <div class="auth-orb auth-orb-one"></div>
+    <div class="auth-orb auth-orb-two"></div>
+    <div class="art-content">
+      <img src="logo.png" class="auth-logo" alt="Fisio1" /><span class="eyebrow light"
+        >Cuidado que evolui</span
+      >
+      <h1>Mais tempo para cuidar.<br />Menos tempo digitando.</h1>
+      <p>Registros clínicos organizados por voz, com revisão profissional em cada etapa.</p>
+      <div class="feature-pills">
+        <span>✦ Áudio inteligente</span><span>✓ Revisão humana</span
+        ><span>↗ Histórico completo</span>
+      </div>
+    </div>
+    <div class="audio-preview">
+      <span class="mini-record-dot"></span>
+      <div class="mini-wave">
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <i></i>
+        }
+      </div>
+      <strong>Registro por voz</strong><small>Transcrição e organização automáticas</small>
+    </div>
+  </div>
+  <div class="auth-panel">
+    <form class="auth-card" (ngSubmit)="signIn()">
+      <span class="eyebrow">Bem-vindo de volta</span>
+      <h2>Acesse sua conta</h2>
+      <p class="muted">Entre para acompanhar seus pacientes e registros.</p>
+      <label class="field-label">E-mail</label>
+      <div class="input-wrap">
+        <span>♙</span><input name="email" [(ngModel)]="login.email" required />
+      </div>
+      <label class="field-label">Senha</label>
+      <div class="input-wrap">
+        <span>⌑</span
+        ><input name="password" [(ngModel)]="login.password" type="password" required />
+      </div>
+      <div class="login-options">
+        <span></span
+        ><button type="button" class="text-button" (click)="requestReset()">
+          Esqueci minha senha
+        </button>
+      </div>
+      <button class="primary-button auth-submit">Entrar <span>→</span></button>
+      <div class="demo-access">
+        <span>ACESSO DE DEMONSTRAÇÃO</span>
+        <p>Usuário: <strong>andre</strong> · Senha: <strong>andre</strong></p>
+      </div>
+    </form>
+  </div>
+</section>

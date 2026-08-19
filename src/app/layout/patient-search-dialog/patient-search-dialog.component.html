@@ -1,0 +1,32 @@
+<div class="modal-backdrop">
+  <div class="modal">
+    <button class="modal-close" (click)="closed.emit()">×</button>
+    <h2>Buscar paciente</h2>
+    <p>Digite o nome, documento ou telefone para localizar rapidamente.</p>
+    <div class="input-wrap">
+      <span>⌕</span
+      ><input
+        #queryInput
+        aria-label="Buscar paciente"
+        placeholder="Buscar paciente..."
+        [value]="query"
+        (input)="search(queryInput.value)"
+      />
+    </div>
+    <div class="search-results">
+      @for (patient of results(); track patient.id) {
+        <button class="search-result" (click)="open(patient)">
+          <app-avatar [id]="patient.id" [name]="patient.name" [hasPhoto]="patient.has_photo" />
+          <div>
+            <strong>{{ patient.name }}</strong
+            ><small>{{ patient.document }} · {{ patient.phone }}</small>
+          </div>
+          <span>›</span>
+        </button>
+      }
+      @if (query.length >= 2 && !results().length) {
+        <p class="muted">Nenhum paciente encontrado.</p>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div class="form-grid">
+  <div class="form-group full">
+    <label>Queixa principal do dia</label
+    ><textarea class="form-control" name="daily" [(ngModel)]="form.daily_complaint"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Nível de dor atual (0 a 10)</label
+    ><input
+      class="form-control"
+      type="number"
+      min="0"
+      max="10"
+      name="pain"
+      [(ngModel)]="form.pain_level"
+    />
+  </div>
+  <div class="form-group full">
+    <label>Adesão às orientações domiciliares</label
+    ><textarea
+      class="form-control"
+      name="adherence"
+      [(ngModel)]="form.home_guidance_adherence"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Conduta terapêutica realizada</label
+    ><textarea
+      class="form-control"
+      name="conduct"
+      [(ngModel)]="form.therapeutic_conduct"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Impressão final da sessão</label
+    ><textarea
+      class="form-control"
+      name="impression"
+      [(ngModel)]="form.session_final_impression"
+    ></textarea>
+  </div>
+  <div class="form-group full">
+    <label>Observações</label
+    ><textarea class="form-control" name="observations" [(ngModel)]="form.observations"></textarea>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="modal-backdrop">
+  <div class="modal">
+    <button class="modal-close" (click)="closed.emit()">×</button>
+    <h2>{{ user() ? 'Editar usuário' : 'Novo usuário' }}</h2>
+    <p>
+      {{
+        user()
+          ? 'Atualize os dados, grupos ou senha. Deixe a senha vazia para mantê-la.'
+          : 'Cadastre um colaborador e defina os grupos de acesso.'
+      }}
+    </p>
+    <form (ngSubmit)="save()">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Foto do usuário</label
+          ><label class="upload-label"
+            >⇧ {{ photo?.name ?? 'Selecionar foto (JPG, PNG ou WEBP, até 5 MB)'
+            }}<input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onPhoto($event)"
+          /></label>
+          @if (preview() || existingPhoto()) {
+            <div class="photo-preview">
+              <img [src]="preview() || existingPhoto()" alt="Prévia da foto do usuário" />
+            </div>
+          }
+        </div>
+        <div class="form-group full">
+          <label>Nome completo</label
+          ><input class="form-control" name="user-name" [(ngModel)]="form.name" required />
+        </div>
+        <div class="form-group full">
+          <label>E-mail</label
+          ><input
+            class="form-control"
+            name="user-email"
+            type="email"
+            [(ngModel)]="form.email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>{{ user() ? 'Nova senha (opcional)' : 'Senha temporária' }}</label
+          ><input
+            class="form-control"
+            name="user-password"
+            type="password"
+            [(ngModel)]="form.password"
+            [required]="!user()"
+          />
+        </div>
+        <div class="form-group">
+          <label>Grupos</label
+          ><select
+            class="form-control"
+            name="user-groups"
+            multiple
+            [(ngModel)]="form.access_group_ids"
+          >
+            @for (group of groups(); track group.id) {
+              <option [ngValue]="group.id">{{ group.name }}</option>
+            }</select
+          ><small>Use Ctrl/Cmd para selecionar mais de um.</small>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="closed.emit()">Cancelar</button
+        ><button class="primary-button">
+          {{ user() ? 'Salvar alterações' : 'Criar usuário' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

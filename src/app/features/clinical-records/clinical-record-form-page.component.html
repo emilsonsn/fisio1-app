@@ -1,0 +1,152 @@
+<div class="record-shell">
+  <section class="page-heading">
+    <div>
+      <span class="eyebrow">REGISTRO CLÍNICO</span>
+      <h1>
+        {{
+          step() === 1
+            ? 'Iniciar atendimento'
+            : step() === 2
+              ? 'Registrar atendimento'
+              : step() === 3
+                ? 'Organizando o atendimento'
+                : 'Revisão do registro'
+        }}
+      </h1>
+      <p>
+        {{
+          step() === 1
+            ? 'Escolha o paciente e o tipo de registro para continuar.'
+            : step() === 2
+              ? 'Fale naturalmente ou envie o áudio da sessão.'
+              : step() === 3
+                ? 'O registro foi enviado e entrará na fila de processamento.'
+                : 'Revise e ajuste os campos antes de confirmar.'
+        }}
+      </p>
+    </div>
+  </section>
+  <div class="stepper">
+    <div class="step" [class.active]="step() === 1" [class.done]="step() > 1">
+      <span>1</span>Dados iniciais
+    </div>
+    <i class="step-line"></i>
+    <div class="step" [class.active]="step() === 2" [class.done]="step() > 2">
+      <span>2</span>Áudio
+    </div>
+    <i class="step-line"></i>
+    <div class="step" [class.active]="step() === 3" [class.done]="step() > 3"><span>3</span>IA</div>
+    <i class="step-line"></i>
+    <div class="step" [class.active]="step() === 4"><span>4</span>Revisão</div>
+  </div>
+  @if (step() === 1) {
+    <form class="panel form-card" (ngSubmit)="continueToAudio()">
+      <h2>Dados do atendimento</h2>
+      <p>Estas informações identificam o registro no histórico do paciente.</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Paciente</label
+          ><select class="form-control" name="patient" [(ngModel)]="form.patient_id" required>
+            <option [ngValue]="0">Selecione um paciente</option>
+            @for (patient of patients(); track patient.id) {
+              <option [ngValue]="patient.id">{{ patient.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Tipo de registro</label>
+          <div class="type-options">
+            <label class="type-option"
+              ><input
+                type="radio"
+                name="type"
+                value="initial_assessment"
+                [(ngModel)]="form.type"
+              /><span
+                ><strong>Avaliação inicial</strong
+                ><small>Primeiro registro e exame clínico</small></span
+              ></label
+            ><label class="type-option"
+              ><input type="radio" name="type" value="evolution" [(ngModel)]="form.type" /><span
+                ><strong>Evolução</strong><small>Acompanhamento do tratamento</small></span
+              ></label
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Data do atendimento</label
+          ><input
+            class="form-control"
+            type="date"
+            name="date"
+            [(ngModel)]="form.performed_at"
+            required
+          />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" routerLink="/records">Cancelar</button
+        ><button class="primary-button">Continuar para áudio →</button>
+      </div>
+    </form>
+  }
+  @if (step() === 2) {
+    <app-audio-recorder-step
+      [type]="form.type"
+      [patientName]="patientName()"
+      (back)="step.set(1)"
+      (submitted)="processAudio($event)"
+    />
+  }
+  @if (step() === 3) {
+    <section class="panel processing">
+      <div class="ai-loader">✦</div>
+      <span class="eyebrow">INTELIGÊNCIA ARTIFICIAL</span>
+      <h2>Cadastrando o processamento</h2>
+      <p class="muted">
+        Em seguida você será levado ao histórico, onde poderá acompanhar o progresso.
+      </p>
+    </section>
+  }
+  @if (step() === 4) {
+    <form class="panel form-card" (ngSubmit)="save()">
+      <div class="review-banner">
+        <span>✦</span>
+        <div>
+          <strong>Conteúdo organizado pela IA</strong>
+          <p>Revise todos os campos antes de concluir.</p>
+        </div>
+      </div>
+      <h2>
+        {{ form.type === 'evolution' ? 'Evolução fisioterapêutica' : 'Avaliação fisioterapêutica' }}
+      </h2>
+      <p>{{ patientName() }} • {{ form.performed_at }}</p>
+      @if (form.type === 'initial_assessment') {
+        <app-assessment-fields [form]="form" />
+      } @else {
+        <app-evolution-fields [form]="form" />
+      }
+      <div class="review-attachments">
+        <div>
+          <strong>Anexos do registro</strong>
+          <p class="muted">Adicione laudos, imagens ou documentos antes de concluir.</p>
+        </div>
+        <label class="upload-label"
+          >⇧ Selecionar arquivos<input type="file" multiple (change)="onFiles($event)"
+        /></label>
+        @if (files.length) {
+          <div class="attachment-list">
+            @for (file of files; track file.name) {
+              <span class="attachment-chip">{{ file.name }}</span>
+            }
+          </div>
+        }
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="router.navigateByUrl('/records')">
+          Voltar ao histórico</button
+        ><button class="primary-button">✓ Revisado — concluir registro</button>
+      </div>
+    </form>
+  }
+</div>
