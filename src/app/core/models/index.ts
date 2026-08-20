@@ -7,6 +7,7 @@ export * from './clinical-record.model';
 export * from './dashboard-data.model';
 export * from './evolution.model';
 export * from './patient.model';
+export * from './patient-history.model';
 export * from './permission.model';
 export * from './record-attachment.model';
 export * from './user.model';

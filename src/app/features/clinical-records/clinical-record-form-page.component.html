@@ -10,7 +10,13 @@
               ? 'Registrar atendimento'
               : step() === 3
                 ? 'Organizando o atendimento'
-                : 'Revisão do registro'
+                : isCancelled()
+                  ? 'Registro cancelado'
+                  : isCompleted()
+                    ? canEditRecord()
+                      ? 'Editar registro'
+                      : 'Visualizar registro'
+                    : 'Revisão do registro'
         }}
       </h1>
       <p>
@@ -21,7 +27,13 @@
               ? 'Fale naturalmente ou envie o áudio da sessão.'
               : step() === 3
                 ? 'O registro foi enviado e entrará na fila de processamento.'
-                : 'Revise e ajuste os campos antes de confirmar.'
+                : isCancelled()
+                  ? 'Consulte os dados preservados deste registro.'
+                  : isCompleted()
+                    ? canEditRecord()
+                      ? 'Atualize os campos necessários e salve as alterações.'
+                      : 'Consulte os dados preenchidos neste registro.'
+                    : 'Revise e ajuste os campos antes de confirmar.'
         }}
       </p>
     </div>
@@ -110,30 +122,106 @@
   }
   @if (step() === 4) {
     <form class="panel form-card" (ngSubmit)="save()">
-      <div class="review-banner">
-        <span>✦</span>
-        <div>
-          <strong>Conteúdo organizado pela IA</strong>
-          <p>Revise todos os campos antes de concluir.</p>
+      @if (isCancelled()) {
+        <div class="review-banner cancelled-record-banner">
+          <span>!</span>
+          <div>
+            <strong>Este registro foi cancelado</strong>
+            <p>
+              {{
+                (form.type === 'evolution' ? 'A evolução' : 'A avaliação') +
+                  ' permanece disponível somente para consulta.'
+              }}
+            </p>
+            @if (savedCancellationReason()) {
+              <p><strong>Motivo:</strong> {{ savedCancellationReason() }}</p>
+            }
+          </div>
         </div>
-      </div>
+      } @else if (isCompleted()) {
+        <div class="review-banner completed-record-banner">
+          <span>✓</span>
+          <div>
+            <strong>Registro concluído</strong>
+            <p>
+              {{
+                canEditRecord()
+                  ? 'Faça os ajustes necessários. Todas as alterações ficarão na auditoria.'
+                  : 'Este registro está disponível somente para consulta.'
+              }}
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="review-banner">
+          <span>✦</span>
+          <div>
+            <strong>Conteúdo organizado pela IA</strong>
+            <p>Revise todos os campos antes de concluir.</p>
+          </div>
+        </div>
+      }
       <h2>
         {{ form.type === 'evolution' ? 'Evolução fisioterapêutica' : 'Avaliação fisioterapêutica' }}
       </h2>
       <p>{{ patientName() }} • {{ form.performed_at }}</p>
-      @if (form.type === 'initial_assessment') {
-        <app-assessment-fields [form]="form" />
-      } @else {
-        <app-evolution-fields [form]="form" />
-      }
+      <fieldset class="clinical-record-fields" [disabled]="isReadOnly()">
+        <div class="form-grid record-identification-fields">
+          <div class="form-group">
+            <label>Paciente</label>
+            <select class="form-control" name="edit-patient" [(ngModel)]="form.patient_id" required>
+              @for (patient of patients(); track patient.id) {
+                <option [ngValue]="patient.id">{{ patient.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data do atendimento</label>
+            <input
+              class="form-control"
+              type="date"
+              name="edit-date"
+              [(ngModel)]="form.performed_at"
+              required
+            />
+          </div>
+        </div>
+        @if (form.type === 'initial_assessment') {
+          <app-assessment-fields [form]="form" />
+        } @else {
+          <app-evolution-fields [form]="form" />
+        }
+      </fieldset>
       <div class="review-attachments">
         <div>
           <strong>Anexos do registro</strong>
-          <p class="muted">Adicione laudos, imagens ou documentos antes de concluir.</p>
+          <p class="muted">
+            {{
+              isReadOnly()
+                ? 'Arquivos preservados neste registro.'
+                : 'Consulte, remova ou adicione documentos ao registro.'
+            }}
+          </p>
         </div>
-        <label class="upload-label"
-          >⇧ Selecionar arquivos<input type="file" multiple (change)="onFiles($event)"
-        /></label>
+        @if (!isReadOnly()) {
+          <label class="upload-label"
+            >⇧ Selecionar arquivos<input type="file" multiple (change)="onFiles($event)"
+          /></label>
+        }
+        @if (attachments().length) {
+          <div class="attachment-list existing-attachment-list">
+            @for (attachment of attachments(); track attachment.id) {
+              <span class="attachment-chip">
+                <button type="button" (click)="downloadAttachment(attachment)">
+                  ⌕ {{ attachment.name }}
+                </button>
+                @if (!isReadOnly()) {
+                  <button type="button" (click)="removeAttachment(attachment.id)">×</button>
+                }
+              </span>
+            }
+          </div>
+        }
         @if (files.length) {
           <div class="attachment-list">
             @for (file of files; track file.name) {
@@ -144,8 +232,13 @@
       </div>
       <div class="form-actions">
         <button type="button" class="secondary-button" (click)="router.navigateByUrl('/records')">
-          Voltar ao histórico</button
-        ><button class="primary-button">✓ Revisado — concluir registro</button>
+          Voltar ao histórico
+        </button>
+        @if (!isReadOnly()) {
+          <button class="primary-button">
+            {{ isCompleted() ? '✓ Salvar alterações' : '✓ Revisado — concluir registro' }}
+          </button>
+        }
       </div>
     </form>
   }

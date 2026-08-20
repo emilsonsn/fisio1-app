@@ -2,7 +2,7 @@ import { Patient } from './patient.model';
 import { User } from './user.model';
 
 export type ClinicalRecordType = 'initial_assessment' | 'evolution';
-export type ClinicalRecordStatus = 'pending' | 'in_review' | 'completed' | 'failed';
+export type ClinicalRecordStatus = 'pending' | 'in_review' | 'completed' | 'failed' | 'cancelled';
 
 export interface ClinicalRecordAttachmentSummary {
   id: number;

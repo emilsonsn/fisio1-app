@@ -1,0 +1,89 @@
+<div class="permission-multiselect" [class.is-open]="opened()">
+  <div
+    class="permission-select-trigger"
+    role="combobox"
+    tabindex="0"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="opened()"
+    (click)="toggleOpen()"
+    (keydown.enter)="toggleOpen()"
+    (keydown.space)="toggleOpen(); $event.preventDefault()"
+  >
+    <div class="permission-selection">
+      @for (permission of visibleSelectedPermissions(); track permission.id) {
+        <span class="permission-selection-chip">
+          {{ permission.name }}
+          <button
+            type="button"
+            [attr.aria-label]="'Remover permissão ' + permission.name"
+            (click)="remove(permission.id, $event)"
+          >
+            ×
+          </button>
+        </span>
+      } @empty {
+        <span class="permission-placeholder">Selecione uma ou mais permissões</span>
+      }
+      @if (selectedPermissions().length > 3) {
+        <span class="permission-more">+{{ selectedPermissions().length - 3 }}</span>
+      }
+    </div>
+    <span class="permission-select-chevron" aria-hidden="true">⌄</span>
+  </div>
+
+  @if (opened()) {
+    <div class="permission-select-panel" role="listbox" aria-multiselectable="true">
+      <div class="permission-select-search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          name="permission-search"
+          placeholder="Buscar por permissão ou módulo..."
+          aria-label="Buscar permissões"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+      <div class="permission-select-toolbar">
+        <span>{{ selectedPermissions().length }} selecionada(s)</span>
+        <div>
+          <button type="button" (click)="selectFiltered()">Selecionar resultados</button>
+          @if (selectedPermissions().length) {
+            <button type="button" (click)="clear()">Limpar</button>
+          }
+        </div>
+      </div>
+      <div class="permission-options">
+        @for (group of groupedPermissions(); track group.module) {
+          <section class="permission-option-group">
+            <h4>{{ group.label }}</h4>
+            @for (permission of group.permissions; track permission.id) {
+              <button
+                type="button"
+                class="permission-option"
+                role="option"
+                [class.selected]="isSelected(permission.id)"
+                [attr.aria-selected]="isSelected(permission.id)"
+                (click)="toggle(permission)"
+              >
+                <span class="permission-option-check" aria-hidden="true">{{
+                  isSelected(permission.id) ? '✓' : ''
+                }}</span>
+                <span>
+                  <strong>{{ permission.name }}</strong>
+                  <small>{{ permission.description || permission.key }}</small>
+                </span>
+              </button>
+            }
+          </section>
+        } @empty {
+          <div class="permission-select-empty">
+            <strong>Nenhuma permissão encontrada</strong>
+            <small>Tente buscar por outro termo.</small>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

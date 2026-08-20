@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../api-url';
 import { toFormData } from '../form-data';
-import { ApiCollection, Patient } from '../models';
+import { ApiCollection, Patient, PatientHistory } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class PatientsService {
@@ -25,14 +25,22 @@ export class PatientsService {
     form.append('_method', 'PATCH');
     return firstValueFrom(this.http.post<{ data: Patient }>(`${API_URL}/patients/${id}`, form));
   }
-  photo(id: number) {
+  delete(id: number) {
+    return firstValueFrom(this.http.delete<void>(`${API_URL}/patients/${id}`));
+  }
+  history(id: number) {
     return firstValueFrom(
-      this.http.get(`${API_URL}/patients/${id}/photo`, { responseType: 'blob' }),
+      this.http.get<{ data: PatientHistory }>(`${API_URL}/patients/${id}/history`),
     );
   }
   historyPdf(id: number) {
     return firstValueFrom(
       this.http.get(`${API_URL}/patients/${id}/history.pdf`, { responseType: 'blob' }),
+    );
+  }
+  photo(id: number) {
+    return firstValueFrom(
+      this.http.get(`${API_URL}/patients/${id}/photo`, { responseType: 'blob' }),
     );
   }
   private form(payload: Partial<Patient>, photo?: File | null) {

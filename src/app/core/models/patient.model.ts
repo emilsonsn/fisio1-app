@@ -14,6 +14,7 @@ export interface Patient {
   email: string | null;
   notes: string | null;
   has_photo: boolean;
+  is_deleted?: boolean;
   clinical_records_count?: number;
   created_at: string;
 }

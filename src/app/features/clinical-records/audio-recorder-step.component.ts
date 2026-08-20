@@ -51,7 +51,7 @@ export class AudioRecorderStepComponent implements OnDestroy {
       this.recording.set(true);
       this.timer = window.setInterval(() => (this.seconds += 1), 1000);
     } catch {
-      this.feedback.error.set('Não foi possível acessar o microfone. Envie um arquivo de áudio.');
+      this.feedback.failure('Não foi possível acessar o microfone. Envie um arquivo de áudio.');
     }
   }
   select(event: Event) {

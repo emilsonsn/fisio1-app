@@ -40,7 +40,13 @@
                   [id]="row.patient.id"
                   [name]="row.patient.name"
                   [hasPhoto]="row.patient.has_photo"
-                /><strong>{{ row.patient.name }}</strong>
+                />
+                <div>
+                  <strong>{{ row.patient.name }}</strong>
+                  @if (row.patient.is_deleted) {
+                    <small class="muted">Paciente excluído</small>
+                  }
+                </div>
               </div>
             </td>
             <td>
@@ -56,6 +62,7 @@
                 [class.processing]="row.status === 'pending'"
                 [class.review]="row.status === 'in_review'"
                 [class.failed]="row.status === 'failed'"
+                [class.cancelled]="row.status === 'cancelled'"
               >
                 @if (row.status === 'pending') {
                   <i class="inline-spinner"></i>
@@ -69,13 +76,31 @@
             <td>
               <div class="table-actions">
                 @if (row.status === 'in_review') {
-                  <button class="review-action" (click)="review(row)">Revisar</button>
+                  <button [class.review-action]="canEdit(row)" (click)="review(row)">
+                    {{ canEdit(row) ? 'Revisar' : 'Ver' }}
+                  </button>
                 } @else if (row.status === 'failed' && row.process) {
                   <button class="retry-action" (click)="retry(row.process.id)">↻</button>
                 } @else if (row.status === 'completed') {
-                  <button (click)="open(row)">›</button>
+                  <button
+                    [title]="canEdit(row) ? 'Editar registro' : 'Visualizar registro'"
+                    (click)="open(row)"
+                  >
+                    {{ canEdit(row) ? '✎' : '›' }}
+                  </button>
+                } @else if (row.status === 'cancelled') {
+                  <button title="Visualizar registro cancelado" (click)="open(row)">›</button>
                 } @else {
                   <button disabled><i class="inline-spinner"></i></button>
+                }
+                @if (canCancel(row) && row.status !== 'cancelled') {
+                  <button
+                    class="cancel-record-action"
+                    title="Cancelar registro"
+                    (click)="requestCancellation(row)"
+                  >
+                    ×
+                  </button>
                 }
               </div>
             </td>
@@ -94,11 +119,35 @@
     </table>
   </div>
 </section>
-@if (selected()) {
-  <app-clinical-record-dialog
-    [record]="selected()!"
-    [type]="selectedType()"
-    (closed)="selected.set(null)"
-    (changed)="detailChanged()"
-  />
+@if (cancelling(); as record) {
+  <div class="modal-backdrop" (click)="closeCancellation()">
+    <form
+      class="modal cancel-record-dialog"
+      (click)="$event.stopPropagation()"
+      (ngSubmit)="confirmCancellation()"
+    >
+      <button type="button" class="modal-close" (click)="closeCancellation()">×</button>
+      <span class="delete-dialog-icon" aria-hidden="true">!</span>
+      <h2>Cancelar {{ record.type === 'evolution' ? 'evolução' : 'avaliação' }}</h2>
+      <p>
+        O registro de <strong>{{ record.patient.name }}</strong> permanecerá no histórico como
+        cancelado e não poderá mais ser editado.
+      </p>
+      <div class="form-group">
+        <label for="cancellation-reason">Motivo do cancelamento <small>(opcional)</small></label>
+        <textarea
+          id="cancellation-reason"
+          class="form-control"
+          name="cancellation-reason"
+          maxlength="1000"
+          placeholder="Ex.: registro duplicado ou atendimento não realizado"
+          [(ngModel)]="cancellationReason"
+        ></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="closeCancellation()">Voltar</button>
+        <button class="danger-button">Confirmar cancelamento</button>
+      </div>
+    </form>
+  </div>
 }

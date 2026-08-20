@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
 import {
   Assessment,
@@ -12,7 +13,6 @@ import {
 } from '../../core/models';
 import { FeedbackService } from '../../core/ui/feedback.service';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
-import { ClinicalRecordDialogComponent } from './clinical-record-dialog.component';
 
 interface RecordRow {
   id: number;
@@ -26,16 +26,16 @@ interface RecordRow {
 
 @Component({
   selector: 'app-clinical-records-page',
-  imports: [FormsModule, AvatarComponent, ClinicalRecordDialogComponent],
+  imports: [FormsModule, AvatarComponent],
   templateUrl: './clinical-records-page.component.html',
 })
 export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
   readonly assessments = signal<Assessment[]>([]);
   readonly evolutions = signal<Evolution[]>([]);
-  readonly selected = signal<Assessment | Evolution | null>(null);
-  readonly selectedType = signal<'initial_assessment' | 'evolution'>('initial_assessment');
+  readonly cancelling = signal<RecordRow | null>(null);
   search = '';
   typeFilter = 'all';
+  cancellationReason = '';
   private pollTimer?: number;
   rows(): RecordRow[] {
     const rows: RecordRow[] = [
@@ -70,6 +70,7 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
   constructor(
     private readonly service: ClinicalRecordsService,
     private readonly feedback: FeedbackService,
+    readonly auth: AuthService,
     readonly router: Router,
   ) {}
   ngOnInit() {
@@ -98,18 +99,26 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
       in_review: 'Em revisão',
       completed: 'Concluído',
       failed: 'Falha no processamento',
+      cancelled: 'Cancelado',
     }[status];
   }
   async open(row: RecordRow) {
-    const record =
-      row.type === 'evolution'
-        ? (await this.service.evolution(row.id)).data
-        : (await this.service.assessment(row.id)).data;
-    this.selectedType.set(row.type);
-    this.selected.set(record);
+    await this.router.navigate(['/records', row.type, row.id, 'edit']);
   }
   async review(row: RecordRow) {
-    await this.router.navigate(['/new-record'], { queryParams: { type: row.type, id: row.id } });
+    await this.open(row);
+  }
+  canEdit(row: RecordRow) {
+    return (
+      this.auth.can('clinical_records.update') &&
+      (this.auth.can('clinical_records.manage_all') || row.professional.id === this.auth.user()?.id)
+    );
+  }
+  canCancel(row: RecordRow) {
+    return (
+      this.auth.can('clinical_records.cancel') &&
+      (this.auth.can('clinical_records.manage_all') || row.professional.id === this.auth.user()?.id)
+    );
   }
   async retry(processId: number) {
     await this.feedback.run(async () => {
@@ -118,15 +127,27 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
       await this.refresh();
     });
   }
-  async detailChanged() {
-    const current = this.selected();
-    if (!current) return;
-    const type = this.selectedType();
-    this.selected.set(
-      type === 'evolution'
-        ? (await this.service.evolution(current.id)).data
-        : (await this.service.assessment(current.id)).data,
+  requestCancellation(row: RecordRow) {
+    if (!this.canCancel(row)) return;
+    this.cancellationReason = '';
+    this.cancelling.set(row);
+  }
+  closeCancellation() {
+    this.cancelling.set(null);
+    this.cancellationReason = '';
+  }
+  async confirmCancellation() {
+    const row = this.cancelling();
+    if (!row) return;
+    const cancelled = await this.feedback.run(async () => {
+      await this.service.cancel(row.type, row.id, this.cancellationReason);
+      return true;
+    });
+    if (!cancelled) return;
+    this.feedback.success(
+      row.type === 'evolution' ? 'Evolução cancelada.' : 'Avaliação cancelada.',
     );
+    this.closeCancellation();
     await this.refresh();
   }
   private schedulePoll() {

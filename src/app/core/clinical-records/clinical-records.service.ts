@@ -54,6 +54,26 @@ export class ClinicalRecordsService {
       ),
     );
   }
+  updateAssessment(id: number, payload: object, files: File[] = []) {
+    const form = toFormData(payload, files);
+    form.append('_method', 'PATCH');
+    return firstValueFrom(
+      this.http.post<{ data: Assessment }>(`${API_URL}/assessments/${id}`, form),
+    );
+  }
+  updateEvolution(id: number, payload: object, files: File[] = []) {
+    const form = toFormData(payload, files);
+    form.append('_method', 'PATCH');
+    return firstValueFrom(this.http.post<{ data: Evolution }>(`${API_URL}/evolutions/${id}`, form));
+  }
+  cancel(type: 'initial_assessment' | 'evolution', id: number, reason: string) {
+    const resource = type === 'evolution' ? 'evolutions' : 'assessments';
+    return firstValueFrom(
+      this.http.post<{ data: Assessment | Evolution }>(`${API_URL}/${resource}/${id}/cancel`, {
+        reason: reason.trim() || null,
+      }),
+    );
+  }
   addAttachments(type: 'initial_assessment' | 'evolution', id: number, files: File[]) {
     const form = toFormData({}, files);
     form.append('_method', 'PATCH');

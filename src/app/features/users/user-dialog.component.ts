@@ -53,8 +53,14 @@ export class UserDialogComponent {
       if (current) {
         await this.users.update(current.id, payload, this.photo);
         this.photos.invalidate('user', current.id);
-      } else await this.users.create(this.form, this.photo);
-      this.feedback.success(current ? 'Usuário atualizado.' : 'Usuário criado.');
+      } else {
+        await this.users.create({ ...this.form, password: undefined }, this.photo);
+      }
+      this.feedback.success(
+        current
+          ? 'Usuário atualizado.'
+          : 'Usuário criado. Os dados de acesso foram enviados por e-mail.',
+      );
       this.saved.emit();
     });
   }

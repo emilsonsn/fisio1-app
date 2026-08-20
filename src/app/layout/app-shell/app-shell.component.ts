@@ -40,6 +40,9 @@ export class AppShellComponent implements OnInit {
     );
   }
   title() {
+    const path = this.router.url.split('?')[0];
+    if (/^\/patients\/\d+\/history$/.test(path)) return 'Histórico do paciente';
+
     return (
       (
         {
@@ -51,7 +54,7 @@ export class AppShellComponent implements OnInit {
           '/groups': 'Grupos e permissões',
           '/audit': 'Auditoria',
         } as Record<string, string>
-      )[this.router.url.split('?')[0]] ?? 'Fisio1'
+      )[path] ?? 'Fisio1'
     );
   }
   async logout() {

@@ -77,9 +77,33 @@
       [(ngModel)]="form.physical_therapy_diagnosis"
     ></textarea>
   </div>
-  <div class="form-group full">
-    <label>CBDF</label
-    ><textarea class="form-control" name="cbdf" [(ngModel)]="form.cbdf"></textarea>
+  <div class="form-group full cbdf-field">
+    <div class="cbdf-field-heading">
+      <label for="cbdf">CBDF</label>
+      <a
+        class="cbdf-portal-link"
+        href="https://cbdf.coffito.gov.br/cbdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Abrir o portal oficial da CBDF em uma nova aba"
+      >
+        <span class="cbdf-link-icon" aria-hidden="true">↗</span>
+        <span>
+          <strong>Consultar CBDF</strong>
+          <small>Portal oficial COFFITO</small>
+        </span>
+      </a>
+    </div>
+    <p class="cbdf-field-hint">
+      Abra o portal, faça a classificação e volte para registrar o resultado abaixo.
+    </p>
+    <textarea
+      id="cbdf"
+      class="form-control"
+      name="cbdf"
+      placeholder="Insira aqui a classificação obtida no portal"
+      [(ngModel)]="form.cbdf"
+    ></textarea>
   </div>
   <div class="form-group">
     <label>Quantidade de atendimentos</label

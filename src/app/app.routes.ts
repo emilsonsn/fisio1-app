@@ -9,6 +9,14 @@ export const routes: Routes = [
       import('./features/login/login-page.component').then((module) => module.LoginPageComponent),
   },
   {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/password-recovery/password-recovery-page.component').then(
+        (module) => module.PasswordRecoveryPageComponent,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -27,6 +35,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/patients/patients-page.component').then(
             (module) => module.PatientsPageComponent,
+          ),
+      },
+      {
+        path: 'patients/:id/history',
+        loadComponent: () =>
+          import('./features/patients/patient-history-page.component').then(
+            (module) => module.PatientHistoryPageComponent,
+          ),
+      },
+      {
+        path: 'records/:type/:id/edit',
+        loadComponent: () =>
+          import('./features/clinical-records/clinical-record-form-page.component').then(
+            (module) => module.ClinicalRecordFormPageComponent,
           ),
       },
       {

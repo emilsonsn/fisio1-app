@@ -1,28 +1,5 @@
 <section class="auth-shell">
-  <div class="auth-art">
-    <div class="auth-orb auth-orb-one"></div>
-    <div class="auth-orb auth-orb-two"></div>
-    <div class="art-content">
-      <img src="logo.png" class="auth-logo" alt="Fisio1" /><span class="eyebrow light"
-        >Cuidado que evolui</span
-      >
-      <h1>Mais tempo para cuidar.<br />Menos tempo digitando.</h1>
-      <p>Registros clínicos organizados por voz, com revisão profissional em cada etapa.</p>
-      <div class="feature-pills">
-        <span>✦ Áudio inteligente</span><span>✓ Revisão humana</span
-        ><span>↗ Histórico completo</span>
-      </div>
-    </div>
-    <div class="audio-preview">
-      <span class="mini-record-dot"></span>
-      <div class="mini-wave">
-        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
-          <i></i>
-        }
-      </div>
-      <strong>Registro por voz</strong><small>Transcrição e organização automáticas</small>
-    </div>
-  </div>
+  <app-auth-art />
   <div class="auth-panel">
     <form class="auth-card" (ngSubmit)="signIn()">
       <span class="eyebrow">Bem-vindo de volta</span>
@@ -38,10 +15,7 @@
         ><input name="password" [(ngModel)]="login.password" type="password" required />
       </div>
       <div class="login-options">
-        <span></span
-        ><button type="button" class="text-button" (click)="requestReset()">
-          Esqueci minha senha
-        </button>
+        <span></span><a class="text-button" routerLink="/forgot-password">Esqueci minha senha</a>
       </div>
       <button class="primary-button auth-submit">Entrar <span>→</span></button>
       <div class="demo-access">
