@@ -30,6 +30,9 @@ export interface Assessment {
   physical_therapy_prognosis: string | null;
   status: ClinicalRecordStatus;
   confirmed_at: string | null;
+  cancelled_at: string | null;
+  cancelled_by: number | null;
+  cancellation_reason: string | null;
   ai_process: ClinicalAiProcess | null;
   patient: Patient;
   professional: User;

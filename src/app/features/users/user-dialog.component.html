@@ -6,7 +6,7 @@
       {{
         user()
           ? 'Atualize os dados, grupos ou senha. Deixe a senha vazia para mantê-la.'
-          : 'Cadastre um colaborador e defina os grupos de acesso.'
+          : 'Cadastre um colaborador e defina os grupos de acesso. Confira o e-mail antes de salvar.'
       }}
     </p>
     <form (ngSubmit)="save()">
@@ -40,17 +40,19 @@
             required
           />
         </div>
-        <div class="form-group">
-          <label>{{ user() ? 'Nova senha (opcional)' : 'Senha temporária' }}</label
-          ><input
-            class="form-control"
-            name="user-password"
-            type="password"
-            [(ngModel)]="form.password"
-            [required]="!user()"
-          />
-        </div>
-        <div class="form-group">
+        @if (user()) {
+          <div class="form-group">
+            <label>Nova senha (opcional)</label
+            ><input
+              class="form-control"
+              name="user-password"
+              type="password"
+              minlength="8"
+              [(ngModel)]="form.password"
+            />
+          </div>
+        }
+        <div class="form-group" [class.full]="!user()">
           <label>Grupos</label
           ><select
             class="form-control"
@@ -63,6 +65,18 @@
             }</select
           ><small>Use Ctrl/Cmd para selecionar mais de um.</small>
         </div>
+        @if (!user()) {
+          <div class="user-invite-note full">
+            <span aria-hidden="true">✉</span>
+            <div>
+              <strong>Acesso enviado automaticamente</strong>
+              <p>
+                O sistema criará uma senha temporária segura e enviará o endereço de acesso, o
+                e-mail e a senha para o novo usuário.
+              </p>
+            </div>
+          </div>
+        }
       </div>
       <div class="form-actions">
         <button type="button" class="secondary-button" (click)="closed.emit()">Cancelar</button

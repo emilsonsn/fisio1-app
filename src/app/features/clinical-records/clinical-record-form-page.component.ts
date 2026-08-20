@@ -1,8 +1,15 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
-import { Assessment, Evolution, Patient } from '../../core/models';
+import {
+  Assessment,
+  ClinicalRecordStatus,
+  Evolution,
+  Patient,
+  RecordAttachment,
+} from '../../core/models';
 import { PatientsService } from '../../core/patients/patients.service';
 import { FeedbackService } from '../../core/ui/feedback.service';
 import { AudioRecorderStepComponent } from './audio-recorder-step.component';
@@ -28,13 +35,18 @@ import { EvolutionFieldsComponent } from './evolution-fields.component';
 export class ClinicalRecordFormPageComponent implements OnInit {
   readonly patients = signal<Patient[]>([]);
   readonly step = signal<1 | 2 | 3 | 4>(1);
+  readonly recordStatus = signal<ClinicalRecordStatus | null>(null);
+  readonly attachments = signal<RecordAttachment[]>([]);
+  readonly savedCancellationReason = signal<string | null>(null);
+  readonly canEditRecord = signal(false);
   form: ClinicalRecordForm = emptyClinicalRecordForm();
   files: File[] = [];
-  private reviewingId: number | null = null;
+  private recordId: number | null = null;
   constructor(
     private readonly records: ClinicalRecordsService,
     private readonly patientsService: PatientsService,
     private readonly feedback: FeedbackService,
+    private readonly auth: AuthService,
     private readonly route: ActivatedRoute,
     readonly router: Router,
   ) {}
@@ -42,15 +54,22 @@ export class ClinicalRecordFormPageComponent implements OnInit {
     await this.feedback.run(async () => {
       this.patients.set((await this.patientsService.list()).data);
       const patientId = Number(this.route.snapshot.queryParamMap.get('patient') ?? 0);
-      const reviewId = Number(this.route.snapshot.queryParamMap.get('id') ?? 0);
-      const type = this.route.snapshot.queryParamMap.get('type') as RecordType | null;
-      if (reviewId && type) await this.loadReview(type, reviewId);
+      const recordId = Number(
+        this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.queryParamMap.get('id') ?? 0,
+      );
+      const typeParameter =
+        this.route.snapshot.paramMap.get('type') ?? this.route.snapshot.queryParamMap.get('type');
+      const type: RecordType | null =
+        typeParameter === 'initial_assessment' || typeParameter === 'evolution'
+          ? typeParameter
+          : null;
+      if (recordId && type) await this.loadRecord(type, recordId);
       else this.form.patient_id = patientId;
     });
   }
   continueToAudio() {
     if (!this.form.patient_id) {
-      this.feedback.error.set('Selecione um paciente para continuar.');
+      this.feedback.failure('Selecione um paciente para continuar.');
       return;
     }
     this.step.set(2);
@@ -73,35 +92,90 @@ export class ClinicalRecordFormPageComponent implements OnInit {
     if (result === undefined && this.feedback.error()) this.step.set(2);
   }
   async save() {
-    if (!this.reviewingId) return;
+    if (!this.recordId || this.isReadOnly()) return;
+    const recordId = this.recordId;
     await this.feedback.run(async () => {
       const payload =
         this.form.type === 'evolution'
           ? { ...this.form, evolved_at: this.form.performed_at }
           : { ...this.form, assessed_at: this.form.performed_at };
-      if (this.form.type === 'evolution')
-        await this.records.confirmEvolution(this.reviewingId!, payload, this.files);
-      else await this.records.confirmAssessment(this.reviewingId!, payload, this.files);
-      this.feedback.success('Registro revisado e concluído com sucesso.');
+      const isReview = this.recordStatus() === 'in_review';
+      if (this.form.type === 'evolution') {
+        if (isReview) await this.records.confirmEvolution(recordId, payload, this.files);
+        else await this.records.updateEvolution(recordId, payload, this.files);
+      } else if (isReview) {
+        await this.records.confirmAssessment(recordId, payload, this.files);
+      } else {
+        await this.records.updateAssessment(recordId, payload, this.files);
+      }
+      this.feedback.success(
+        isReview
+          ? 'Registro revisado e concluído com sucesso.'
+          : 'Registro atualizado com sucesso.',
+      );
       await this.router.navigateByUrl('/records');
+    });
+  }
+  isCancelled() {
+    return this.recordStatus() === 'cancelled';
+  }
+  isCompleted() {
+    return this.recordStatus() === 'completed';
+  }
+  isReadOnly() {
+    return this.isCancelled() || !this.canEditRecord();
+  }
+  async removeAttachment(id: number) {
+    if (this.isReadOnly()) return;
+    const removed = await this.feedback.run(async () => {
+      await this.records.deleteAttachment(id);
+      return true;
+    });
+    if (!removed) return;
+    this.attachments.update((attachments) =>
+      attachments.filter((attachment) => attachment.id !== id),
+    );
+    this.feedback.success('Anexo removido.');
+  }
+  async downloadAttachment(attachment: RecordAttachment) {
+    await this.feedback.run(async () => {
+      const url = URL.createObjectURL(await this.records.downloadAttachment(attachment.id));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.name;
+      link.click();
+      URL.revokeObjectURL(url);
     });
   }
   patientName() {
     return this.patients().find((patient) => patient.id === this.form.patient_id)?.name ?? '';
   }
-  private async loadReview(type: RecordType, id: number) {
+  private async loadRecord(type: RecordType, id: number) {
     const record =
       type === 'evolution'
         ? (await this.records.evolution(id)).data
         : (await this.records.assessment(id)).data;
-    if (record.status !== 'in_review') {
+    if (!['in_review', 'completed', 'cancelled'].includes(record.status)) {
       await this.router.navigateByUrl('/records');
       return;
     }
-    this.reviewingId = id;
+    this.recordId = id;
+    this.recordStatus.set(record.status);
+    this.attachments.set(record.attachments);
+    this.savedCancellationReason.set(record.cancellation_reason);
+    this.canEditRecord.set(
+      this.auth.can('clinical_records.update') &&
+        (this.auth.can('clinical_records.manage_all') ||
+          record.professional_id === this.auth.user()?.id),
+    );
+    const form = emptyClinicalRecordForm();
+    const formValues = form as unknown as Record<string, unknown>;
+    const recordValues = record as unknown as Record<string, unknown>;
+    Object.keys(formValues).forEach((field) => {
+      if (field in recordValues) formValues[field] = recordValues[field];
+    });
     this.form = {
-      ...this.form,
-      ...record,
+      ...form,
       patient_id: record.patient_id,
       type,
       performed_at:

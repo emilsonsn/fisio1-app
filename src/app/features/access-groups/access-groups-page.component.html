@@ -2,70 +2,162 @@
   <div>
     <span class="eyebrow">CONTROLE DE ACESSO</span>
     <h1>Grupos e permissões</h1>
-    <p>Defina o acesso de cada grupo e ajuste as permissões quando necessário.</p>
+    <p>Organize os perfis de acesso e defina o que cada equipe pode visualizar ou alterar.</p>
+  </div>
+  <button class="primary-button" type="button" (click)="open()">＋ Novo grupo</button>
+</section>
+
+<section class="panel data-table access-groups-table">
+  <div class="groups-table-toolbar">
+    <div class="groups-search">
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        placeholder="Buscar grupo ou permissão..."
+        aria-label="Buscar grupo ou permissão"
+        [value]="search()"
+        (input)="onSearch($event)"
+      />
+      @if (search()) {
+        <button type="button" aria-label="Limpar busca" (click)="search.set('')">×</button>
+      }
+    </div>
+    <span class="groups-total">
+      {{ filteredGroups().length }} {{ filteredGroups().length === 1 ? 'grupo' : 'grupos' }}
+    </span>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>GRUPO</th>
+          <th>USUÁRIOS</th>
+          <th>PERMISSÕES</th>
+          <th>TIPO</th>
+          <th>AÇÕES</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (group of filteredGroups(); track group.id) {
+          <tr>
+            <td>
+              <div class="person-cell">
+                <span class="group-table-icon" [class.system]="group.is_system" aria-hidden="true"
+                  >⚿</span
+                >
+                <div>
+                  <strong>{{ group.name }}</strong>
+                  <small>{{ group.description || 'Sem descrição' }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="group-users-count">
+                <strong>{{ group.users_count ?? 0 }}</strong>
+                {{ (group.users_count ?? 0) === 1 ? 'usuário' : 'usuários' }}
+              </span>
+            </td>
+            <td>
+              <div class="permissions group-permission-summary">
+                @for (permission of visiblePermissions(group); track permission.id) {
+                  <span class="permission">{{ permission.name }}</span>
+                } @empty {
+                  <span class="muted">Nenhuma permissão</span>
+                }
+                @if (group.permissions.length > 3) {
+                  <span class="permission permission-count"
+                    >+{{ group.permissions.length - 3 }}</span
+                  >
+                }
+              </div>
+            </td>
+            <td>
+              <span class="group-type" [class.system]="group.is_system">
+                {{ group.is_system ? 'Protegido' : 'Personalizado' }}
+              </span>
+            </td>
+            <td>
+              <div class="table-actions group-actions">
+                <button
+                  type="button"
+                  aria-label="Editar grupo"
+                  title="Editar grupo"
+                  [disabled]="group.is_system"
+                  (click)="open(group)"
+                >
+                  ✎
+                </button>
+                <button
+                  type="button"
+                  class="delete-action"
+                  aria-label="Excluir grupo"
+                  [title]="deletionTitle(group)"
+                  [disabled]="!canDelete(group)"
+                  (click)="requestDeletion(group)"
+                >
+                  ⌫
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">
+              <div class="empty-state groups-empty-state">
+                <span aria-hidden="true">⚿</span>
+                <h3>{{ search() ? 'Nenhum grupo encontrado' : 'Nenhum grupo cadastrado' }}</h3>
+                <p>
+                  {{
+                    search()
+                      ? 'Ajuste o termo da busca para encontrar outro grupo.'
+                      : 'Crie um grupo para começar a organizar os acessos.'
+                  }}
+                </p>
+                @if (!search()) {
+                  <button class="primary-button" type="button" (click)="open()">Criar grupo</button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
 </section>
-<section class="split">
-  <form class="panel form-card" (ngSubmit)="save()">
-    <h2>{{ editing() ? 'Editar grupo' : 'Novo grupo' }}</h2>
-    <p>
-      {{
-        editing()
-          ? 'Atualize os dados e confirme as permissões.'
-          : 'Selecione as permissões que este grupo poderá usar.'
-      }}
-    </p>
-    <div class="form-group">
-      <label>Nome</label
-      ><input class="form-control" name="group-name" [(ngModel)]="form.name" required />
-    </div>
-    <div class="form-group">
-      <label>Descrição</label
-      ><textarea
-        class="form-control"
-        name="group-description"
-        [(ngModel)]="form.description"
-      ></textarea>
-    </div>
-    <div class="form-group">
-      <label>Permissões</label>
-      <div class="permission-picker">
-        @for (permission of permissions(); track permission.id) {
-          <label class="check-label"
-            ><input
-              type="checkbox"
-              [checked]="form.permission_ids.includes(permission.id)"
-              (change)="togglePermission(permission.id)"
-            /><span>{{ permission.name }}</span
-            ><small>{{ permission.module }} · {{ permission.description }}</small></label
-          >
-        }
+
+@if (dialogOpen()) {
+  <app-access-group-dialog
+    [group]="editing()"
+    [permissions]="permissions()"
+    (closed)="close()"
+    (saved)="saved()"
+  />
+}
+
+@if (pendingDeletion(); as group) {
+  <div class="modal-backdrop" (click)="cancelDeletion()">
+    <div
+      class="modal delete-group-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="modal-close" type="button" aria-label="Fechar" (click)="cancelDeletion()">
+        ×
+      </button>
+      <span class="delete-dialog-icon" aria-hidden="true">!</span>
+      <h2>Excluir grupo?</h2>
+      <p>
+        O grupo <strong>{{ group.name }}</strong> será removido permanentemente. Esta ação não pode
+        ser desfeita.
+      </p>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancelDeletion()">Cancelar</button>
+        <button type="button" class="danger-button" (click)="confirmDeletion()">
+          Excluir grupo
+        </button>
       </div>
     </div>
-    <div class="form-actions">
-      @if (editing()) {
-        <button type="button" class="secondary-button" (click)="cancel()">Cancelar</button>
-      }
-      <button class="primary-button">{{ editing() ? 'Salvar alterações' : 'Criar grupo' }}</button>
-    </div>
-  </form>
-  <div class="group-list">
-    @for (group of groups(); track group.id) {
-      <article class="panel group-card">
-        <div>
-          <span class="group-icon">⚿</span>
-          <div>
-            <h3>{{ group.name }}</h3>
-            <p>{{ group.description || 'Sem descrição' }}</p>
-          </div>
-        </div>
-        <div>
-          <span class="status">{{ group.permissions.length }} permissões</span>
-          @if (!group.is_system) {
-            <button class="ghost-button" (click)="edit(group)">Editar</button>
-          }
-        </div>
-      </article>
-    }
   </div>
-</section>
+}

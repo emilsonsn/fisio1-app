@@ -36,9 +36,28 @@ export class AuthService {
     }
   }
 
-  forgotPassword(email: string) {
+  requestPasswordRecoveryCode(email: string, website = '') {
     return firstValueFrom(
-      this.http.post<{ message: string }>(`${API_URL}/auth/forgot-password`, { email }),
+      this.http.post<{ message: string }>(`${API_URL}/auth/forgot-password`, { email, website }),
+    );
+  }
+
+  verifyPasswordRecoveryCode(email: string, code: string) {
+    return firstValueFrom(
+      this.http.post<{
+        data: { email: string; reset_token: string; expires_in: number };
+      }>(`${API_URL}/auth/forgot-password/verify`, { email, code }),
+    );
+  }
+
+  resetPassword(email: string, token: string, password: string, passwordConfirmation: string) {
+    return firstValueFrom(
+      this.http.post<{ message: string }>(`${API_URL}/auth/reset-password`, {
+        email,
+        token,
+        password,
+        password_confirmation: passwordConfirmation,
+      }),
     );
   }
 

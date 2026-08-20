@@ -1,0 +1,63 @@
+<div class="modal-backdrop" (click)="closeFromBackdrop($event)">
+  <div class="modal access-group-dialog" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Fechar" (click)="closed.emit()">×</button>
+    <div class="access-group-dialog-heading">
+      <span class="group-dialog-icon" aria-hidden="true">⚿</span>
+      <div>
+        <h2>{{ group() ? 'Editar grupo' : 'Novo grupo' }}</h2>
+        <p>
+          {{
+            group()
+              ? 'Atualize os dados e os acessos concedidos a este grupo.'
+              : 'Crie um grupo e defina quais áreas seus integrantes poderão acessar.'
+          }}
+        </p>
+      </div>
+    </div>
+
+    <form (ngSubmit)="save()">
+      <div class="form-group">
+        <label for="access-group-name">Nome do grupo</label>
+        <input
+          id="access-group-name"
+          class="form-control"
+          name="group-name"
+          maxlength="120"
+          placeholder="Ex.: Fisioterapeutas"
+          [(ngModel)]="form.name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="access-group-description">Descrição <small>(opcional)</small></label>
+        <textarea
+          id="access-group-description"
+          class="form-control"
+          name="group-description"
+          rows="3"
+          maxlength="500"
+          placeholder="Descreva para quem este grupo será utilizado"
+          [(ngModel)]="form.description"
+        ></textarea>
+      </div>
+      <div class="form-group access-group-permissions-field">
+        <div class="field-heading">
+          <label>Permissões</label>
+          <span>{{ form.permission_ids.length }} de {{ permissions().length }}</span>
+        </div>
+        <app-permission-multiselect
+          [permissions]="permissions()"
+          [value]="form.permission_ids"
+          (valueChange)="form.permission_ids = $event"
+        />
+        <small>As permissões definem as telas e ações disponíveis para os usuários do grupo.</small>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="closed.emit()">Cancelar</button>
+        <button class="primary-button" [disabled]="!form.name.trim()">
+          {{ group() ? 'Salvar alterações' : 'Criar grupo' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

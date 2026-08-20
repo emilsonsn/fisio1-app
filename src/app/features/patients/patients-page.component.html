@@ -49,8 +49,42 @@
             <td>{{ patient.clinical_records_count ?? 0 }}</td>
             <td>
               <div class="table-actions">
-                <button (click)="edit(patient)">✎</button><button (click)="pdf(patient)">⇩</button
-                ><a [routerLink]="['/new-record']" [queryParams]="{ patient: patient.id }">◉</a>
+                <button
+                  title="Editar paciente"
+                  aria-label="Editar paciente"
+                  (click)="edit(patient)"
+                >
+                  ✎
+                </button>
+                <a
+                  class="patient-history-action"
+                  title="Ver histórico do paciente"
+                  aria-label="Ver histórico do paciente"
+                  [routerLink]="['/patients', patient.id, 'history']"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                    <circle cx="12" cy="12" r="2.8" />
+                  </svg>
+                </a>
+                <a
+                  title="Iniciar novo registro"
+                  aria-label="Iniciar novo registro"
+                  [routerLink]="['/new-record']"
+                  [queryParams]="{ patient: patient.id }"
+                  >◉</a
+                >
+                @if (canDelete()) {
+                  <button
+                    type="button"
+                    class="delete-action"
+                    title="Excluir paciente"
+                    aria-label="Excluir paciente"
+                    (click)="requestDeletion(patient)"
+                  >
+                    ⌫
+                  </button>
+                }
               </div>
             </td>
           </tr>
@@ -71,4 +105,38 @@
 </section>
 @if (dialogOpen()) {
   <app-patient-dialog [patient]="editing()" (closed)="close()" (saved)="saved()" />
+}
+@if (pendingDeletion(); as patient) {
+  <div class="modal-backdrop" (click)="cancelDeletion()">
+    <div
+      class="modal delete-patient-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-patient-title"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="modal-close" type="button" aria-label="Fechar" (click)="cancelDeletion()">
+        ×
+      </button>
+      <span class="delete-dialog-icon" aria-hidden="true">!</span>
+      <h2 id="delete-patient-title">Excluir paciente?</h2>
+      <div class="delete-patient-summary">
+        <app-avatar [id]="patient.id" [name]="patient.name" [hasPhoto]="patient.has_photo" />
+        <div>
+          <strong>{{ patient.name }}</strong>
+          <small>{{ patient.document }}</small>
+        </div>
+      </div>
+      <p>
+        O paciente será removido das listagens e não poderá receber novos registros. O histórico
+        clínico existente será preservado para auditoria.
+      </p>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancelDeletion()">Cancelar</button>
+        <button type="button" class="danger-button" (click)="confirmDeletion()">
+          Excluir paciente
+        </button>
+      </div>
+    </div>
+  </div>
 }

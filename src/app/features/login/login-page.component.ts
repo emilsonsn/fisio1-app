@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { FeedbackService } from '../../core/ui/feedback.service';
+import { AuthArtComponent } from '../../shared/auth-art/auth-art.component';
 
 @Component({
   selector: 'app-login-page',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink, AuthArtComponent],
   templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent {
@@ -21,10 +22,5 @@ export class LoginPageComponent {
       await this.auth.login(this.login.email, this.login.password);
       await this.router.navigateByUrl('/');
     });
-  }
-  async requestReset() {
-    await this.feedback.run(async () =>
-      this.feedback.success((await this.auth.forgotPassword(this.login.email)).message),
-    );
   }
 }

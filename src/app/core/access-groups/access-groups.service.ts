@@ -21,4 +21,7 @@ export class AccessGroupsService {
       this.http.patch<{ data: AccessGroup }>(`${API_URL}/groups/${id}`, payload),
     );
   }
+  delete(id: number) {
+    return firstValueFrom(this.http.delete<void>(`${API_URL}/groups/${id}`));
+  }
 }
