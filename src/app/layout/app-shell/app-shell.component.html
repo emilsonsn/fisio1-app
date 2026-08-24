@@ -53,11 +53,13 @@
     }
     <div class="sidebar-footer">
       @if (auth.user(); as user) {
-        <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
-        <div>
-          <strong>{{ user.name }}</strong
-          ><small>{{ groupNames() }}</small>
-        </div>
+        <a class="sidebar-profile-link" routerLink="/profile" routerLinkActive="active">
+          <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
+          <div>
+            <strong>{{ user.name }}</strong
+            ><small>{{ groupNames() }}</small>
+          </div>
+        </a>
       }
       <button (click)="logout()">↪</button>
     </div>
@@ -78,7 +80,9 @@
           {{ theme.dark() ? '☾' : '☼' }}
         </button>
         @if (auth.user(); as user) {
-          <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
+          <a class="topbar-profile-link" routerLink="/profile">
+            <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />
+          </a>
         }
       </div>
     </header>

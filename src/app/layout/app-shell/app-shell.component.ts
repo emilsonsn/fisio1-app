@@ -50,6 +50,7 @@ export class AppShellComponent implements OnInit {
           '/patients': 'Pacientes',
           '/records': 'Avaliações e evoluções',
           '/new-record': 'Novo registro',
+          '/profile': 'Meu perfil',
           '/user': 'Usuários',
           '/groups': 'Grupos e permissões',
           '/audit': 'Auditoria',

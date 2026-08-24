@@ -73,6 +73,10 @@ export class AuthService {
     return this.user()?.permissions?.includes(permission) ?? false;
   }
 
+  updateUser(user: User): void {
+    this.user.set(user);
+  }
+
   private clear(): void {
     sessionStorage.removeItem('fisio1-token');
     this.user.set(null);

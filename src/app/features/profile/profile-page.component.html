@@ -1,0 +1,91 @@
+<section class="page-heading">
+  <div>
+    <span class="eyebrow">MINHA CONTA</span>
+    <h1>Meu perfil</h1>
+    <p>Atualize seus dados pessoais e sua senha de acesso.</p>
+  </div>
+</section>
+
+<form class="panel form-card" #profileForm="ngForm" (ngSubmit)="saveProfile()">
+  <h2>Dados pessoais</h2>
+  <p>Essas informações aparecem para toda a equipe.</p>
+  <div class="form-grid">
+    <div class="form-group full">
+      <label>Foto de perfil</label
+      ><label class="upload-label"
+        >⇧ {{ photo?.name ?? 'Selecionar foto (JPG, PNG ou WEBP, até 5 MB)'
+        }}<input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onPhoto($event)"
+      /></label>
+      @if (preview() || currentPhoto()) {
+        <div class="photo-preview">
+          <img [src]="preview() || currentPhoto()" alt="Prévia da foto de perfil" />
+        </div>
+      }
+    </div>
+    <div class="form-group full">
+      <label>Nome completo</label
+      ><input class="form-control" name="profile-name" [(ngModel)]="form.name" required />
+    </div>
+    <div class="form-group full">
+      <label>E-mail</label
+      ><input class="form-control" [value]="auth.user()?.email" disabled />
+      <small class="muted">O e-mail de acesso não pode ser alterado.</small>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="primary-button" [disabled]="profileForm.invalid">Salvar alterações</button>
+  </div>
+</form>
+
+<form class="panel form-card" #passwordFormRef="ngForm" (ngSubmit)="savePassword()">
+  <h2>Segurança</h2>
+  <p>Defina uma nova senha de acesso. Você precisará informar a senha atual.</p>
+  <div class="form-grid">
+    <div class="form-group full">
+      <label>Senha atual</label
+      ><input
+        class="form-control"
+        type="password"
+        name="current-password"
+        autocomplete="current-password"
+        [(ngModel)]="passwordForm.current_password"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label>Nova senha</label
+      ><input
+        class="form-control"
+        type="password"
+        name="new-password"
+        autocomplete="new-password"
+        minlength="8"
+        [(ngModel)]="passwordForm.password"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label>Confirmar nova senha</label
+      ><input
+        class="form-control"
+        type="password"
+        name="new-password-confirmation"
+        autocomplete="new-password"
+        minlength="8"
+        [(ngModel)]="passwordForm.password_confirmation"
+        required
+      />
+      @if (passwordsMismatch()) {
+        <small class="field-error">As senhas não coincidem.</small>
+      }
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="primary-button" [disabled]="passwordFormRef.invalid || passwordsMismatch()">
+      Atualizar senha
+    </button>
+  </div>
+</form>

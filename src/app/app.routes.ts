@@ -76,6 +76,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile-page.component').then(
+            (module) => module.ProfilePageComponent,
+          ),
+      },
+      {
         path: 'user',
         canActivate: [administrationGuard],
         loadComponent: () =>
