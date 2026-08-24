@@ -21,4 +21,9 @@ export class DashboardPageComponent implements OnInit {
   firstName() {
     return this.auth.user()?.name.split(' ')[0] ?? '';
   }
+  todayLabel() {
+    return new Date()
+      .toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
+      .toUpperCase();
+  }
 }

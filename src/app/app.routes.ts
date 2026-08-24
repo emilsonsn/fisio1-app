@@ -1,5 +1,12 @@
 import { Routes } from '@angular/router';
-import { administrationGuard, auditGuard, authGuard, guestGuard } from './core/auth/auth.guard';
+import {
+  administrationGuard,
+  auditGuard,
+  authGuard,
+  clinicalRecordsCreateGuard,
+  clinicalRecordsViewGuard,
+  guestGuard,
+} from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -46,6 +53,7 @@ export const routes: Routes = [
       },
       {
         path: 'records/:type/:id/edit',
+        canActivate: [clinicalRecordsViewGuard],
         loadComponent: () =>
           import('./features/clinical-records/clinical-record-form-page.component').then(
             (module) => module.ClinicalRecordFormPageComponent,
@@ -53,6 +61,7 @@ export const routes: Routes = [
       },
       {
         path: 'records',
+        canActivate: [clinicalRecordsViewGuard],
         loadComponent: () =>
           import('./features/clinical-records/clinical-records-page.component').then(
             (module) => module.ClinicalRecordsPageComponent,
@@ -60,6 +69,7 @@ export const routes: Routes = [
       },
       {
         path: 'new-record',
+        canActivate: [clinicalRecordsCreateGuard],
         loadComponent: () =>
           import('./features/clinical-records/clinical-record-form-page.component').then(
             (module) => module.ClinicalRecordFormPageComponent,

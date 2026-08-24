@@ -11,12 +11,20 @@
         ><span>⌂</span>Início</a
       ><a class="nav-link" routerLink="/patients" routerLinkActive="active"
         ><span>♧</span>Pacientes <b>{{ dashboard.data().active_patients }}</b></a
-      ><small>ATENDIMENTO</small
-      ><a class="nav-link" routerLink="/new-record" routerLinkActive="active"
-        ><span>◉</span>Novo registro</a
-      ><a class="nav-link" routerLink="/records" routerLinkActive="active"
-        ><span>▤</span>Avaliações e evoluções</a
       >
+      @if (can('clinical_records.view') || can('clinical_records.create')) {
+        <small>ATENDIMENTO</small>
+        @if (can('clinical_records.create')) {
+          <a class="nav-link" routerLink="/new-record" routerLinkActive="active"
+            ><span>◉</span>Novo registro</a
+          >
+        }
+        @if (can('clinical_records.view')) {
+          <a class="nav-link" routerLink="/records" routerLinkActive="active"
+            ><span>▤</span>Avaliações e evoluções</a
+          >
+        }
+      }
       @if (can('users.manage') || can('groups.view') || can('audit_logs.view')) {
         <small>ADMINISTRAÇÃO</small>
         @if (can('users.manage')) {
@@ -36,11 +44,13 @@
         }
       }
     </nav>
-    <div class="sidebar-insight">
-      <span>✦</span><strong>Registre por voz</strong>
-      <p>Transforme o atendimento em um registro organizado.</p>
-      <a routerLink="/new-record">Começar agora →</a>
-    </div>
+    @if (can('clinical_records.create')) {
+      <div class="sidebar-insight">
+        <span>✦</span><strong>Registre por voz</strong>
+        <p>Transforme o atendimento em um registro organizado.</p>
+        <a routerLink="/new-record">Começar agora →</a>
+      </div>
+    }
     <div class="sidebar-footer">
       @if (auth.user(); as user) {
         <app-avatar type="user" [id]="user.id" [name]="user.name" [hasPhoto]="user.has_photo" />

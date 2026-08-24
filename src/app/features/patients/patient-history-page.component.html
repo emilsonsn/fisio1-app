@@ -35,176 +35,187 @@
             Baixar relatório
           </button>
         }
-        <a
-          class="primary-button"
-          routerLink="/new-record"
-          [queryParams]="{ patient: data.patient.id }"
-          >◉ Novo registro</a
-        >
-      </div>
-    </section>
-
-    <section class="patient-history-stats">
-      <article class="panel history-stat-card">
-        <span class="history-stat-icon records">▤</span>
-        <div>
-          <small>Registros clínicos</small>
-          <strong>{{ data.summary.total_records }}</strong>
-          <p>
-            {{ data.summary.total_assessments }}
-            {{ data.summary.total_assessments === 1 ? 'avaliação' : 'avaliações' }} ·
-            {{ data.summary.total_evolutions }}
-            {{ data.summary.total_evolutions === 1 ? 'evolução' : 'evoluções' }}
-          </p>
-        </div>
-      </article>
-      <article class="panel history-stat-card">
-        <span class="history-stat-icon period">◷</span>
-        <div>
-          <small>Período acompanhado</small>
-          <strong>{{ treatmentPeriod() }}</strong>
-          <p>
-            {{ formatDate(data.summary.first_record_at) }} →
-            {{ formatDate(data.summary.last_record_at) }}
-          </p>
-        </div>
-      </article>
-      <article class="panel history-stat-card pain-summary">
-        <span class="history-stat-icon pain">◇</span>
-        <div>
-          <small>Evolução da dor</small>
-          @if (
-            data.summary.initial_pain_level !== null && data.summary.current_pain_level !== null
-          ) {
-            <strong>
-              {{ data.summary.initial_pain_level }}
-              <i>→</i>
-              {{ data.summary.current_pain_level }}
-              <em>/10</em>
-            </strong>
-          } @else {
-            <strong>—</strong>
-          }
-          <p [class]="painChangeClass()">{{ painChangeLabel() }}</p>
-        </div>
-      </article>
-    </section>
-
-    <section class="history-timeline-section">
-      <header class="history-section-heading">
-        <div>
-          <span class="eyebrow">LINHA DO TEMPO CLÍNICA</span>
-          <h2>Evolução do tratamento</h2>
-          <p>Da avaliação mais antiga até o registro mais recente.</p>
-        </div>
-        <span class="history-order">Mais antigo <i>→</i> mais recente</span>
-      </header>
-
-      <div class="patient-history-timeline">
-        @for (entry of data.timeline; track entry.type + '-' + entry.id; let first = $first) {
-          <article
-            class="history-timeline-entry"
-            [class.evolution]="entry.type === 'evolution'"
-            [class.first-entry]="first"
+        @if (auth.can('clinical_records.create')) {
+          <a
+            class="primary-button"
+            routerLink="/new-record"
+            [queryParams]="{ patient: data.patient.id }"
+            >◉ Novo registro</a
           >
-            <div class="history-timeline-marker">
-              <span>{{ entry.type === 'evolution' ? '↗' : '▤' }}</span>
-            </div>
-            <div class="panel history-entry-card">
-              <header>
-                <div class="history-entry-title">
-                  <div>
-                    <span class="record-type" [class.evolution]="entry.type === 'evolution'">
-                      {{ entryTypeLabel(entry) }}
-                    </span>
-                    @if (first) {
-                      <span class="history-start-label">Início do acompanhamento</span>
-                    }
-                  </div>
-                  <h3>{{ entryTitle(entry) }}</h3>
-                  <p>
-                    {{ formatDate(entry.recorded_at) }} ·
-                    {{ entry.professional.name }}
-                  </p>
-                </div>
-                <div class="history-entry-meta">
-                  <span
-                    class="status-pill"
-                    [class.processing]="entry.status === 'pending'"
-                    [class.review]="entry.status === 'in_review'"
-                    [class.failed]="entry.status === 'failed'"
-                    [class.cancelled]="entry.status === 'cancelled'"
-                  >
-                    {{ statusLabel(entry.status) }}
-                  </span>
-                  @if (entry.attachment_count) {
-                    <span class="history-attachment-count"
-                      >⌕ {{ entry.attachment_count }}
-                      {{ entry.attachment_count === 1 ? 'anexo' : 'anexos' }}</span
-                    >
-                  }
-                </div>
-              </header>
-
-              @if (entry.pain_level !== null) {
-                <div class="history-pain-progress">
-                  <div class="history-pain-heading">
-                    <span>Nível de dor nesta sessão</span>
-                    <strong>{{ entry.pain_level }}<small>/10</small></strong>
-                  </div>
-                  <div class="history-pain-track">
-                    <i [style.width.%]="painWidth(entry.pain_level)"></i>
-                  </div>
-                  @if (painComparison(entry); as comparison) {
-                    <span
-                      class="history-pain-change"
-                      [class.improvement]="comparison.cssClass === 'improvement'"
-                      [class.worsening]="comparison.cssClass === 'worsening'"
-                      [class.stable]="comparison.cssClass === 'stable'"
-                    >
-                      {{ comparison.label }}
-                    </span>
-                  }
-                </div>
-              }
-
-              <div class="history-field-grid">
-                @for (field of visibleFields(entry); track field.label) {
-                  <div class="history-field">
-                    <small>{{ field.label }}</small>
-                    <p>{{ field.value }}</p>
-                  </div>
-                } @empty {
-                  <p class="muted">
-                    Este registro ainda não possui informações clínicas preenchidas.
-                  </p>
-                }
-              </div>
-
-              @if (fields(entry).length > 3) {
-                <button class="history-expand-button" type="button" (click)="toggleEntry(entry)">
-                  {{ isExpanded(entry) ? 'Mostrar menos' : 'Ver todos os campos' }}
-                  <span>{{ isExpanded(entry) ? '↑' : '↓' }}</span>
-                </button>
-              }
-            </div>
-          </article>
-        } @empty {
-          <div class="panel empty-state history-empty-state">
-            <span>▤</span>
-            <h3>Nenhum registro clínico</h3>
-            <p>
-              Quando uma avaliação ou evolução for concluída, ela aparecerá nesta linha do tempo.
-            </p>
-            <a
-              class="primary-button"
-              routerLink="/new-record"
-              [queryParams]="{ patient: data.patient.id }"
-              >Iniciar primeiro registro</a
-            >
-          </div>
         }
       </div>
     </section>
+
+    @if (auth.can('clinical_records.view')) {
+      <section class="patient-history-stats">
+        <article class="panel history-stat-card">
+          <span class="history-stat-icon records">▤</span>
+          <div>
+            <small>Registros clínicos</small>
+            <strong>{{ data.summary.total_records }}</strong>
+            <p>
+              {{ data.summary.total_assessments }}
+              {{ data.summary.total_assessments === 1 ? 'avaliação' : 'avaliações' }} ·
+              {{ data.summary.total_evolutions }}
+              {{ data.summary.total_evolutions === 1 ? 'evolução' : 'evoluções' }}
+            </p>
+          </div>
+        </article>
+        <article class="panel history-stat-card">
+          <span class="history-stat-icon period">◷</span>
+          <div>
+            <small>Período acompanhado</small>
+            <strong>{{ treatmentPeriod() }}</strong>
+            <p>
+              {{ formatDate(data.summary.first_record_at) }} →
+              {{ formatDate(data.summary.last_record_at) }}
+            </p>
+          </div>
+        </article>
+        <article class="panel history-stat-card pain-summary">
+          <span class="history-stat-icon pain">◇</span>
+          <div>
+            <small>Evolução da dor</small>
+            @if (
+              data.summary.initial_pain_level !== null && data.summary.current_pain_level !== null
+            ) {
+              <strong>
+                {{ data.summary.initial_pain_level }}
+                <i>→</i>
+                {{ data.summary.current_pain_level }}
+                <em>/10</em>
+              </strong>
+            } @else {
+              <strong>—</strong>
+            }
+            <p [class]="painChangeClass()">{{ painChangeLabel() }}</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="history-timeline-section">
+        <header class="history-section-heading">
+          <div>
+            <span class="eyebrow">LINHA DO TEMPO CLÍNICA</span>
+            <h2>Evolução do tratamento</h2>
+            <p>Da avaliação mais antiga até o registro mais recente.</p>
+          </div>
+          <span class="history-order">Mais antigo <i>→</i> mais recente</span>
+        </header>
+
+        <div class="patient-history-timeline">
+          @for (entry of data.timeline; track entry.type + '-' + entry.id; let first = $first) {
+            <article
+              class="history-timeline-entry"
+              [class.evolution]="entry.type === 'evolution'"
+              [class.first-entry]="first"
+            >
+              <div class="history-timeline-marker">
+                <span>{{ entry.type === 'evolution' ? '↗' : '▤' }}</span>
+              </div>
+              <div class="panel history-entry-card">
+                <header>
+                  <div class="history-entry-title">
+                    <div>
+                      <span class="record-type" [class.evolution]="entry.type === 'evolution'">
+                        {{ entryTypeLabel(entry) }}
+                      </span>
+                      @if (first) {
+                        <span class="history-start-label">Início do acompanhamento</span>
+                      }
+                    </div>
+                    <h3>{{ entryTitle(entry) }}</h3>
+                    <p>
+                      {{ formatDate(entry.recorded_at) }} ·
+                      {{ entry.professional.name }}
+                    </p>
+                  </div>
+                  <div class="history-entry-meta">
+                    <span
+                      class="status-pill"
+                      [class.processing]="entry.status === 'pending'"
+                      [class.review]="entry.status === 'in_review'"
+                      [class.failed]="entry.status === 'failed'"
+                      [class.cancelled]="entry.status === 'cancelled'"
+                    >
+                      {{ statusLabel(entry.status) }}
+                    </span>
+                    @if (entry.attachment_count) {
+                      <span class="history-attachment-count"
+                        >⌕ {{ entry.attachment_count }}
+                        {{ entry.attachment_count === 1 ? 'anexo' : 'anexos' }}</span
+                      >
+                    }
+                  </div>
+                </header>
+
+                @if (entry.pain_level !== null) {
+                  <div class="history-pain-progress">
+                    <div class="history-pain-heading">
+                      <span>Nível de dor nesta sessão</span>
+                      <strong>{{ entry.pain_level }}<small>/10</small></strong>
+                    </div>
+                    <div class="history-pain-track">
+                      <i [style.width.%]="painWidth(entry.pain_level)"></i>
+                    </div>
+                    @if (painComparison(entry); as comparison) {
+                      <span
+                        class="history-pain-change"
+                        [class.improvement]="comparison.cssClass === 'improvement'"
+                        [class.worsening]="comparison.cssClass === 'worsening'"
+                        [class.stable]="comparison.cssClass === 'stable'"
+                      >
+                        {{ comparison.label }}
+                      </span>
+                    }
+                  </div>
+                }
+
+                <div class="history-field-grid">
+                  @for (field of visibleFields(entry); track field.label) {
+                    <div class="history-field">
+                      <small>{{ field.label }}</small>
+                      <p>{{ field.value }}</p>
+                    </div>
+                  } @empty {
+                    <p class="muted">
+                      Este registro ainda não possui informações clínicas preenchidas.
+                    </p>
+                  }
+                </div>
+
+                @if (fields(entry).length > 3) {
+                  <button
+                    class="history-expand-button"
+                    type="button"
+                    (click)="toggleEntry(entry)"
+                  >
+                    {{ isExpanded(entry) ? 'Mostrar menos' : 'Ver todos os campos' }}
+                    <span>{{ isExpanded(entry) ? '↑' : '↓' }}</span>
+                  </button>
+                }
+              </div>
+            </article>
+          } @empty {
+            <div class="panel empty-state history-empty-state">
+              <span>▤</span>
+              <h3>Nenhum registro clínico</h3>
+              <p>
+                Quando uma avaliação ou evolução for concluída, ela aparecerá nesta linha do
+                tempo.
+              </p>
+              @if (auth.can('clinical_records.create')) {
+                <a
+                  class="primary-button"
+                  routerLink="/new-record"
+                  [queryParams]="{ patient: data.patient.id }"
+                  >Iniciar primeiro registro</a
+                >
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
   </div>
 }

@@ -29,3 +29,15 @@ export const auditGuard: CanActivateFn = () => {
     ? true
     : router.createUrlTree(['/']);
 };
+
+export const clinicalRecordsViewGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.can('clinical_records.view') ? true : router.createUrlTree(['/']);
+};
+
+export const clinicalRecordsCreateGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.can('clinical_records.create') ? true : router.createUrlTree(['/']);
+};
