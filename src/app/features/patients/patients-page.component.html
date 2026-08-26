@@ -12,7 +12,8 @@
     ><input
       #query
       placeholder="Buscar por nome, documento ou telefone"
-      (input)="search(query.value)"
+      [value]="currentSearch()"
+      (input)="onSearch(query.value)"
     />
   </div>
 </div>
@@ -102,6 +103,42 @@
       </tbody>
     </table>
   </div>
+  @if (total()) {
+    <footer class="patient-table-footer">
+      <span>Exibindo {{ pageFrom() }}–{{ pageTo() }} de {{ total() }} pacientes</span>
+      @if (lastPage() > 1) {
+        <nav class="patient-pagination" aria-label="Paginação de pacientes">
+          <button
+            type="button"
+            aria-label="Página anterior"
+            [disabled]="currentPage() === 1"
+            (click)="goToPage(currentPage() - 1)"
+          >
+            ←
+          </button>
+          @for (page of pageNumbers(); track page) {
+            <button
+              type="button"
+              [class.active]="page === currentPage()"
+              [attr.aria-current]="page === currentPage() ? 'page' : null"
+              [attr.aria-label]="'Ir para a página ' + page"
+              (click)="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+          }
+          <button
+            type="button"
+            aria-label="Próxima página"
+            [disabled]="currentPage() === lastPage()"
+            (click)="goToPage(currentPage() + 1)"
+          >
+            →
+          </button>
+        </nav>
+      }
+    </footer>
+  }
 </section>
 @if (dialogOpen()) {
   <app-patient-dialog [patient]="editing()" (closed)="close()" (saved)="saved()" />

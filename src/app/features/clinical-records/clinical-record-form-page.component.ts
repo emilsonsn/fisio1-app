@@ -10,8 +10,8 @@ import {
   Patient,
   RecordAttachment,
 } from '../../core/models';
-import { PatientsService } from '../../core/patients/patients.service';
 import { FeedbackService } from '../../core/ui/feedback.service';
+import { PatientSelectComponent } from '../../shared/patient-select/patient-select.component';
 import { AudioRecorderStepComponent } from './audio-recorder-step.component';
 import { AssessmentFieldsComponent } from './assessment-fields.component';
 import {
@@ -29,11 +29,12 @@ import { EvolutionFieldsComponent } from './evolution-fields.component';
     AudioRecorderStepComponent,
     AssessmentFieldsComponent,
     EvolutionFieldsComponent,
+    PatientSelectComponent,
   ],
   templateUrl: './clinical-record-form-page.component.html',
 })
 export class ClinicalRecordFormPageComponent implements OnInit {
-  readonly patients = signal<Patient[]>([]);
+  readonly selectedPatient = signal<Patient | null>(null);
   readonly step = signal<1 | 2 | 3 | 4>(1);
   readonly recordStatus = signal<ClinicalRecordStatus | null>(null);
   readonly attachments = signal<RecordAttachment[]>([]);
@@ -44,7 +45,6 @@ export class ClinicalRecordFormPageComponent implements OnInit {
   private recordId: number | null = null;
   constructor(
     private readonly records: ClinicalRecordsService,
-    private readonly patientsService: PatientsService,
     private readonly feedback: FeedbackService,
     private readonly auth: AuthService,
     private readonly route: ActivatedRoute,
@@ -52,7 +52,6 @@ export class ClinicalRecordFormPageComponent implements OnInit {
   ) {}
   async ngOnInit() {
     await this.feedback.run(async () => {
-      this.patients.set((await this.patientsService.list()).data);
       const patientId = Number(this.route.snapshot.queryParamMap.get('patient') ?? 0);
       const recordId = Number(
         this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.queryParamMap.get('id') ?? 0,
@@ -148,7 +147,7 @@ export class ClinicalRecordFormPageComponent implements OnInit {
     });
   }
   patientName() {
-    return this.patients().find((patient) => patient.id === this.form.patient_id)?.name ?? '';
+    return this.selectedPatient()?.name ?? '';
   }
   private async loadRecord(type: RecordType, id: number) {
     const record =
@@ -163,6 +162,7 @@ export class ClinicalRecordFormPageComponent implements OnInit {
     this.recordStatus.set(record.status);
     this.attachments.set(record.attachments);
     this.savedCancellationReason.set(record.cancellation_reason);
+    this.selectedPatient.set(record.patient);
     this.canEditRecord.set(
       this.auth.can('clinical_records.update') &&
         (this.auth.can('clinical_records.manage_all') ||

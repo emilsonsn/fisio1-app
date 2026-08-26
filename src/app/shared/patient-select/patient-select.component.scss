@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.patient-select-help {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+:host ::ng-deep .patient-smart-select .ng-select-container {
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+:host ::ng-deep .patient-smart-select.ng-select-focused:not(.ng-select-opened) .ng-select-container,
+:host ::ng-deep .patient-smart-select.ng-select-opened .ng-select-container {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(0 174 239 / 12%);
+}
+
+:host ::ng-deep .patient-smart-select .ng-value-container {
+  padding-left: 13px;
+}
+
+:host ::ng-deep .patient-smart-select .ng-input > input {
+  color: var(--ink);
+}
+
+:host ::ng-deep .patient-smart-select .ng-placeholder,
+:host ::ng-deep .patient-smart-select .ng-clear-wrapper,
+:host ::ng-deep .patient-smart-select .ng-arrow-wrapper {
+  color: var(--muted);
+}
+
+:host ::ng-deep .patient-smart-select .ng-dropdown-panel {
+  overflow: hidden;
+  margin-top: 5px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 14px 34px rgb(3 30 52 / 18%);
+}
+
+:host ::ng-deep .patient-smart-select .ng-dropdown-panel-items .ng-option {
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+:host ::ng-deep .patient-smart-select .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background: var(--primary-soft);
+}
+
+:host ::ng-deep .patient-smart-select .ng-dropdown-panel-items .ng-option.ng-option-selected {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.patient-select-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-select-item > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.patient-select-item strong,
+.patient-select-item small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-select-item strong {
+  font-size: 11px;
+}
+
+.patient-select-item small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.selected-item app-avatar {
+  transform: scale(0.82);
+}
+
+:host ::ng-deep .patient-smart-select.ng-select-disabled .ng-select-container {
+  cursor: default;
+  opacity: 0.72;
+}

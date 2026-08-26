@@ -8,12 +8,16 @@ import { ApiCollection, Patient, PatientHistory } from '../models';
 @Injectable({ providedIn: 'root' })
 export class PatientsService {
   constructor(private readonly http: HttpClient) {}
-  list(search = '') {
-    return firstValueFrom(
-      this.http.get<ApiCollection<Patient>>(`${API_URL}/patients`, {
-        params: new HttpParams().set('search', search),
-      }),
-    );
+  query(search = '', page = 1, perPage = 15) {
+    return this.http.get<ApiCollection<Patient>>(`${API_URL}/patients`, {
+      params: new HttpParams().set('search', search).set('page', page).set('per_page', perPage),
+    });
+  }
+  list(search = '', page = 1, perPage = 15) {
+    return firstValueFrom(this.query(search, page, perPage));
+  }
+  get(id: number) {
+    return firstValueFrom(this.http.get<{ data: Patient }>(`${API_URL}/patients/${id}`));
   }
   create(payload: Partial<Patient>, photo?: File | null) {
     return firstValueFrom(

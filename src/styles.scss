@@ -1853,6 +1853,60 @@ a.ghost-button,
   opacity: 0.45;
 }
 
+.patient-table-footer {
+  display: flex;
+  min-height: 68px;
+  padding: 14px 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.patient-table-footer > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.patient-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.patient-pagination button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 10px;
+  font-weight: 800;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+
+.patient-pagination button:hover:not(:disabled),
+.patient-pagination button.active {
+  border-color: var(--primary);
+  color: white;
+  background: var(--primary);
+  transform: translateY(-1px);
+}
+
+.patient-pagination button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 [data-theme='dark'] .audit-event[data-group='autenticacao'] {
   background: #2b2443;
 }
@@ -1891,5 +1945,15 @@ a.ghost-button,
 
   .audit-filter-actions button {
     flex: 1;
+  }
+
+  .patient-table-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .patient-pagination {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -1,0 +1,43 @@
+<ng-select
+  class="patient-smart-select"
+  [items]="patients()"
+  bindLabel="name"
+  bindValue="id"
+  [ngModel]="value"
+  [ngModelOptions]="{ standalone: true }"
+  (ngModelChange)="select($event)"
+  [typeahead]="searchTerms"
+  [loading]="loading()"
+  [readonly]="isDisabled()"
+  [virtualScroll]="true"
+  [bufferAmount]="6"
+  [clearable]="true"
+  [searchable]="true"
+  placeholder="Busque e selecione um paciente"
+  notFoundText="Nenhum paciente encontrado"
+  loadingText="Buscando pacientes..."
+  typeToSearchText="Digite para buscar"
+  ariaLabel="Selecionar paciente"
+  (scrollToEnd)="loadNextPage()"
+  (blur)="markTouched()"
+>
+  <ng-template ng-label-tmp let-item="item">
+    <span class="patient-select-item selected-item">
+      <app-avatar [id]="item.id" [name]="item.name" [hasPhoto]="item.has_photo" />
+      <span>
+        <strong>{{ item.name }}</strong>
+        <small>{{ item.document || item.phone }}</small>
+      </span>
+    </span>
+  </ng-template>
+  <ng-template ng-option-tmp let-item="item">
+    <span class="patient-select-item">
+      <app-avatar [id]="item.id" [name]="item.name" [hasPhoto]="item.has_photo" />
+      <span>
+        <strong>{{ item.name }}</strong>
+        <small>{{ item.document || 'Documento não informado' }} · {{ item.phone }}</small>
+      </span>
+    </span>
+  </ng-template>
+</ng-select>
+<small class="patient-select-help">Digite nome, documento ou telefone para buscar na base.</small>
