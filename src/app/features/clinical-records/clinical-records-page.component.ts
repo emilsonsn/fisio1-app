@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
+import { formatDateBr } from '../../core/date-format';
 import {
   Assessment,
   ClinicalAiProcess,
@@ -30,6 +31,7 @@ interface RecordRow {
   templateUrl: './clinical-records-page.component.html',
 })
 export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
+  readonly formatDate = formatDateBr;
   readonly assessments = signal<Assessment[]>([]);
   readonly evolutions = signal<Evolution[]>([]);
   readonly cancelling = signal<RecordRow | null>(null);

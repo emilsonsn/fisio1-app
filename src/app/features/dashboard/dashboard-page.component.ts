@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { formatDateBr } from '../../core/date-format';
 import { DashboardService } from '../../core/dashboard/dashboard.service';
 import { FeedbackService } from '../../core/ui/feedback.service';
 
@@ -10,6 +11,7 @@ import { FeedbackService } from '../../core/ui/feedback.service';
   templateUrl: './dashboard-page.component.html',
 })
 export class DashboardPageComponent implements OnInit {
+  readonly formatDate = formatDateBr;
   constructor(
     readonly auth: AuthService,
     readonly dashboard: DashboardService,

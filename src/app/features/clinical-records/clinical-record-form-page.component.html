@@ -164,7 +164,7 @@
       <h2>
         {{ form.type === 'evolution' ? 'Evolução fisioterapêutica' : 'Avaliação fisioterapêutica' }}
       </h2>
-      <p>{{ patientName() }} • {{ form.performed_at }}</p>
+      <p>{{ patientName() }} • {{ formatDate(form.performed_at) }}</p>
       <fieldset class="clinical-record-fields" [disabled]="isReadOnly()">
         <div class="form-grid record-identification-fields">
           <div class="form-group">

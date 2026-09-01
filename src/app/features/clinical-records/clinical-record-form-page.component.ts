@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
+import { formatDateBr } from '../../core/date-format';
 import {
   Assessment,
   ClinicalRecordStatus,
@@ -34,6 +35,7 @@ import { EvolutionFieldsComponent } from './evolution-fields.component';
   templateUrl: './clinical-record-form-page.component.html',
 })
 export class ClinicalRecordFormPageComponent implements OnInit {
+  readonly formatDate = formatDateBr;
   readonly selectedPatient = signal<Patient | null>(null);
   readonly step = signal<1 | 2 | 3 | 4>(1);
   readonly recordStatus = signal<ClinicalRecordStatus | null>(null);

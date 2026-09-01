@@ -5,8 +5,8 @@
     <p>Acompanhe o que está acontecendo na clínica hoje.</p>
   </div>
   <div class="heading-actions">
-    <a class="secondary-button" routerLink="/patients">＋ Novo paciente</a
-    >@if (auth.can('clinical_records.create')) {
+    <a class="secondary-button" routerLink="/patients">＋ Novo paciente</a>
+    @if (auth.can('clinical_records.create')) {
       <a class="primary-button" routerLink="/new-record">◉ Iniciar registro</a>
     }
   </div>
@@ -26,7 +26,9 @@
       ><span class="trend">Histórico organizado</span>
     </article>
     <article class="stat-card">
-      <div class="stat-card-head"><span>Evoluções no mês</span><span class="stat-icon">↗</span></div>
+      <div class="stat-card-head">
+        <span>Evoluções no mês</span><span class="stat-icon">↗</span>
+      </div>
       <strong>{{ dashboard.data().records_this_month }}</strong
       ><span class="trend">Registros deste mês</span>
     </article>
@@ -56,7 +58,7 @@
               <span class="activity-icon">{{ r.type === 'evolution' ? '↗' : '▤' }}</span>
               <div>
                 <strong>{{ r.patient.name }}</strong>
-                <p>{{ r.professional.name }} · {{ r.performed_at }}</p>
+                <p>{{ r.professional.name }} · {{ formatDate(r.performed_at) }}</p>
               </div>
               <span class="record-type" [class.evolution]="r.type === 'evolution'">{{
                 r.type === 'evolution' ? 'Evolução' : 'Avaliação inicial'

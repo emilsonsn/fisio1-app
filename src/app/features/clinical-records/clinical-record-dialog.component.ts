@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { formatDateBr } from '../../core/date-format';
 import { Assessment, Evolution } from '../../core/models';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
 import { FeedbackService } from '../../core/ui/feedback.service';
@@ -17,9 +18,11 @@ export class ClinicalRecordDialogComponent {
     private readonly feedback: FeedbackService,
   ) {}
   date() {
-    return this.type() === 'evolution'
-      ? (this.record() as Evolution).evolved_at
-      : (this.record() as Assessment).assessed_at;
+    return formatDateBr(
+      this.type() === 'evolution'
+        ? (this.record() as Evolution).evolved_at
+        : (this.record() as Assessment).assessed_at,
+    );
   }
   fields() {
     const record = this.record();

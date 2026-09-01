@@ -6,7 +6,7 @@
   display: block;
   margin-top: 7px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 :host ::ng-deep .patient-smart-select .ng-select-container {
@@ -83,12 +83,12 @@
 }
 
 .patient-select-item strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .patient-select-item small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .selected-item app-avatar {

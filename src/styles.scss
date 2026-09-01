@@ -1957,3 +1957,162 @@ a.ghost-button,
     justify-content: center;
   }
 }
+
+/* Readability pass: keep supporting text comfortably legible across clinical and RBAC views. */
+.workspace-tag small,
+.main-nav > small,
+.sidebar-footer small,
+.search-button kbd {
+  font-size: 10px;
+}
+
+.workspace-tag strong,
+.activity-item strong {
+  font-size: 13px;
+}
+
+.sidebar-insight p,
+.activity-item p,
+.activity-item time,
+.attention-card p,
+.review-banner p,
+.role-card p,
+.patient-meta {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sidebar-insight button,
+.sidebar-footer strong,
+.topbar-title span,
+.trend,
+.record-type,
+.attachment-chip,
+.info-list small,
+.timeline-item small,
+.permission {
+  font-size: 11px;
+}
+
+th {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+td,
+.form-control {
+  font-size: 13px;
+}
+
+.person-cell small,
+.status {
+  font-size: 11px;
+}
+
+.form-group label {
+  font-size: 12px;
+}
+
+.groups-total,
+.group-users-count,
+.group-permission-summary .permission,
+.group-type,
+.field-heading > span,
+.access-group-permissions-field > small,
+.permission-selection-chip,
+.permission-more,
+.permission-select-toolbar > span,
+.permission-select-toolbar button {
+  font-size: 11px;
+}
+
+.permission-select-search input {
+  font-size: 12px;
+}
+
+.permission-option-group h4 {
+  font-size: 10px;
+}
+
+.permission-option {
+  padding: 11px;
+}
+
+.permission-option > span:last-child {
+  flex: 1;
+}
+
+.permission-option strong {
+  font-size: 13px;
+}
+
+.permission-option small {
+  margin-top: 4px;
+  overflow: visible;
+  font-size: 12px;
+  line-height: 1.5;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.history-back,
+.history-patient-meta span,
+.history-order,
+.history-attachment-count,
+.history-expand-button {
+  font-size: 11px;
+}
+
+.history-stat-card > div > small,
+.history-stat-card p,
+.history-section-heading p,
+.history-entry-title p,
+.history-pain-heading > span {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.history-start-label {
+  font-size: 10px;
+}
+
+.history-pain-heading strong small,
+.history-pain-change,
+.history-field small {
+  font-size: 11px;
+}
+
+.history-field p {
+  display: block;
+  overflow: visible;
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-line-clamp: unset;
+}
+
+.status-pill {
+  font-size: 11px;
+}
+
+.status-pill small {
+  font-size: 10px;
+}
+
+.audit-total,
+.audit-date small,
+.audit-target-id,
+.audit-group,
+.audit-event,
+.audit-detail-button,
+.audit-change-card > strong,
+.audit-value span,
+.audit-metadata span,
+.audit-pagination span,
+.patient-table-footer > span,
+.patient-pagination button {
+  font-size: 11px;
+}
+
+.audit-value small {
+  font-size: 10px;
+}

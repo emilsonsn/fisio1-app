@@ -54,7 +54,7 @@
                 row.type === 'evolution' ? 'Evolução' : 'Avaliação inicial'
               }}</span>
             </td>
-            <td>{{ row.performedAt }}</td>
+            <td>{{ formatDate(row.performedAt) }}</td>
             <td>{{ row.professional.name }}</td>
             <td>
               <span
