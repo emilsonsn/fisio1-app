@@ -44,7 +44,7 @@ export interface AuditLogOptions {
 }
 
 export interface AuditLogFilters {
-  event: string;
+  events: string[];
   user_id: number | null;
   date_from: string;
   date_to: string;

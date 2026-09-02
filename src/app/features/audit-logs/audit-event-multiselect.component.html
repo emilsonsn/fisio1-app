@@ -1,0 +1,75 @@
+<div class="permission-multiselect" [class.is-open]="opened()">
+  <div
+    class="permission-select-trigger"
+    role="combobox"
+    tabindex="0"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="opened()"
+    (click)="toggleOpen()"
+    (keydown.enter)="toggleOpen()"
+    (keydown.space)="toggleOpen(); $event.preventDefault()"
+  >
+    <div class="permission-selection">
+      @for (event of visibleSelectedEvents(); track event.value) {
+        <span class="permission-selection-chip">
+          {{ event.label }}
+          <button type="button" [attr.aria-label]="'Remover categoria ' + event.label" (click)="remove(event.value, $event)">×</button>
+        </span>
+      } @empty {
+        <span class="permission-placeholder">Selecione uma ou mais categorias</span>
+      }
+      @if (selectedEvents().length > 3) {
+        <span class="permission-more">+{{ selectedEvents().length - 3 }}</span>
+      }
+    </div>
+    <span class="permission-select-chevron" aria-hidden="true">⌄</span>
+  </div>
+
+  @if (opened()) {
+    <div class="permission-select-panel" role="listbox" aria-multiselectable="true">
+      <div class="permission-select-search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          name="audit-event-search"
+          placeholder="Buscar por categoria..."
+          aria-label="Buscar categorias de ação"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+      <div class="permission-select-toolbar">
+        <span>{{ selectedEvents().length }} selecionada(s)</span>
+        <div>
+          <button type="button" (click)="selectFiltered()">Selecionar resultados</button>
+          @if (selectedEvents().length) {
+            <button type="button" (click)="clear()">Limpar</button>
+          }
+        </div>
+      </div>
+      <div class="permission-options">
+        @for (group of groupedEvents(); track group.label) {
+          <section class="permission-option-group">
+            <h4>{{ group.label }}</h4>
+            @for (event of group.events; track event.value) {
+              <button
+                type="button"
+                class="permission-option"
+                role="option"
+                [class.selected]="isSelected(event.value)"
+                [attr.aria-selected]="isSelected(event.value)"
+                (click)="toggle(event)"
+              >
+                <span class="permission-option-check" aria-hidden="true">{{ isSelected(event.value) ? '✓' : '' }}</span>
+                <span><strong>{{ event.label }}</strong><small>{{ event.value }}</small></span>
+              </button>
+            }
+          </section>
+        } @empty {
+          <div class="permission-select-empty"><strong>Nenhuma categoria encontrada</strong><small>Tente buscar por outro termo.</small></div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -11,7 +11,7 @@ export class AuditLogsService {
   list(filters: AuditLogFilters, page = 1) {
     let params = new HttpParams().set('page', page).set('per_page', 20);
 
-    if (filters.event) params = params.set('event', filters.event);
+    filters.events.forEach((event) => (params = params.append('events[]', event)));
     if (filters.user_id) params = params.set('user_id', filters.user_id);
     if (filters.date_from) params = params.set('date_from', filters.date_from);
     if (filters.date_to) params = params.set('date_to', filters.date_to);

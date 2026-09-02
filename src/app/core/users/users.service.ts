@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../api-url';
@@ -8,8 +8,13 @@ import { ApiCollection, User } from '../models';
 @Injectable({ providedIn: 'root' })
 export class UsersService {
   constructor(private readonly http: HttpClient) {}
-  list() {
-    return firstValueFrom(this.http.get<ApiCollection<User>>(`${API_URL}/users`));
+  query(search = '', page = 1, perPage = 15) {
+    return this.http.get<ApiCollection<User>>(`${API_URL}/users`, {
+      params: new HttpParams().set('search', search).set('page', page).set('per_page', perPage),
+    });
+  }
+  list(search = '', page = 1, perPage = 15) {
+    return firstValueFrom(this.query(search, page, perPage));
   }
   create(payload: object, photo?: File | null) {
     return firstValueFrom(

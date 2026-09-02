@@ -1,10 +1,24 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { AuditLogsService } from '../../core/audit-logs/audit-logs.service';
-import { AuditEventOption, AuditLog, AuditLogFilters, AuditLogOptions } from '../../core/models';
+import { AuditEventOption, AuditLog, AuditLogFilters, AuditLogOptions, User } from '../../core/models';
 import { FeedbackService } from '../../core/ui/feedback.service';
+import { UsersService } from '../../core/users/users.service';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { AuditEventMultiselectComponent } from './audit-event-multiselect.component';
 
 interface ChangedField {
   key: string;
@@ -12,20 +26,35 @@ interface ChangedField {
   after: unknown;
 }
 
+interface UserRequest {
+  term: string;
+  page: number;
+  append: boolean;
+}
+
 @Component({
   selector: 'app-audit-logs-page',
-  imports: [DatePipe, FormsModule, AvatarComponent],
+  imports: [DatePipe, FormsModule, NgSelectModule, AvatarComponent, AuditEventMultiselectComponent],
   templateUrl: './audit-logs-page.component.html',
 })
-export class AuditLogsPageComponent implements OnInit {
+export class AuditLogsPageComponent implements OnInit, OnDestroy {
   readonly logs = signal<AuditLog[]>([]);
   readonly options = signal<AuditLogOptions>({ events: [], users: [] });
+  readonly users = signal<User[]>([]);
+  readonly loadingUsers = signal(false);
+  readonly userSearchTerms = new Subject<string>();
   readonly expandedId = signal<number | null>(null);
   readonly currentPage = signal(1);
   readonly lastPage = signal(1);
   readonly total = signal(0);
 
   filters: AuditLogFilters = this.emptyFilters();
+
+  private currentUserTerm = '';
+  private currentUserPage = 0;
+  private lastUserPage = 1;
+  private readonly userRequests = new Subject<UserRequest>();
+  private readonly subscriptions = new Subscription();
 
   private readonly fieldLabels: Record<string, string> = {
     name: 'Nome',
@@ -57,10 +86,12 @@ export class AuditLogsPageComponent implements OnInit {
 
   constructor(
     private readonly service: AuditLogsService,
+    private readonly usersService: UsersService,
     private readonly feedback: FeedbackService,
   ) {}
 
   ngOnInit(): void {
+    this.setupUserSearch();
     void this.feedback.run(async () => {
       const [options, logs] = await Promise.all([
         this.service.options(),
@@ -69,6 +100,10 @@ export class AuditLogsPageComponent implements OnInit {
       this.options.set(options.data);
       this.setPage(logs);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   applyFilters(): void {
@@ -142,6 +177,11 @@ export class AuditLogsPageComponent implements OnInit {
       .replaceAll(' ', '-');
   }
 
+  loadNextUserPage(): void {
+    if (this.loadingUsers() || this.currentUserPage >= this.lastUserPage) return;
+    this.requestUserPage(this.currentUserPage + 1, true);
+  }
+
   private async loadPage(page: number): Promise<void> {
     await this.feedback.run(async () => this.setPage(await this.service.list(this.filters, page)));
   }
@@ -154,7 +194,51 @@ export class AuditLogsPageComponent implements OnInit {
     this.expandedId.set(null);
   }
 
+  private setupUserSearch(): void {
+    this.subscriptions.add(
+      this.userRequests
+        .pipe(
+          tap(() => this.loadingUsers.set(true)),
+          switchMap((request) =>
+            this.usersService.query(request.term, request.page, 20).pipe(
+              map((response) => ({ request, response })),
+              catchError((error: unknown) => {
+                this.feedback.failure(error);
+                return of({ request, response: null });
+              }),
+            ),
+          ),
+        )
+        .subscribe(({ request, response }) => {
+          this.loadingUsers.set(false);
+          if (!response || request.term !== this.currentUserTerm) return;
+
+          const selected = this.users().find((user) => user.id === this.filters.user_id);
+          const incoming = request.append ? [...this.users(), ...response.data] : response.data;
+          if (selected && !incoming.some((user) => user.id === selected.id)) incoming.unshift(selected);
+          this.users.set(
+            incoming.filter(
+              (user, index, users) => users.findIndex((candidate) => candidate.id === user.id) === index,
+            ),
+          );
+          this.currentUserPage = response.meta?.current_page ?? request.page;
+          this.lastUserPage = response.meta?.last_page ?? 1;
+        }),
+    );
+    this.subscriptions.add(
+      this.userSearchTerms.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
+        this.currentUserTerm = term.trim();
+        this.requestUserPage(1, false);
+      }),
+    );
+    this.requestUserPage(1, false);
+  }
+
+  private requestUserPage(page: number, append: boolean): void {
+    this.userRequests.next({ term: this.currentUserTerm, page, append });
+  }
+
   private emptyFilters(): AuditLogFilters {
-    return { event: '', user_id: null, date_from: '', date_to: '' };
+    return { events: [], user_id: null, date_from: '', date_to: '' };
   }
 }
