@@ -9,23 +9,6 @@
   </button>
 </section>
 <section class="records-filter-panel">
-  <div class="records-tabs" aria-label="Visão dos registros">
-    <button
-      type="button"
-      [class.active]="activeTab === 'all'"
-      (click)="changeTab('all')"
-    >
-      Todas
-    </button>
-    <button
-      type="button"
-      [class.active]="activeTab === 'in_review'"
-      (click)="changeTab('in_review')"
-    >
-      Em revisão
-    </button>
-  </div>
-
   <div class="records-filters">
     <div class="records-filter-field patient-filter-field">
       <label>Paciente</label>
@@ -47,8 +30,7 @@
       <label>Status</label>
       <select
         class="filter-select"
-        [disabled]="activeTab === 'in_review'"
-        [ngModel]="activeTab === 'in_review' ? 'in_review' : statusFilter"
+        [ngModel]="statusFilter"
         (ngModelChange)="onStatusFilterChange($event)"
       >
         <option value="">Todos os status</option>

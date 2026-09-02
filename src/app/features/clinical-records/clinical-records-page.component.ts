@@ -37,7 +37,6 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
   readonly assessments = signal<Assessment[]>([]);
   readonly evolutions = signal<Evolution[]>([]);
   readonly cancelling = signal<RecordRow | null>(null);
-  activeTab: 'all' | 'in_review' = 'all';
   patientId: number | null = null;
   statusFilter: ClinicalRecordStatus | '' = '';
   typeFilter = 'all';
@@ -100,7 +99,7 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
       dateTo: this.dateTo,
       patientId: this.patientId,
       perPage: 100,
-      status: this.currentStatusFilter(),
+      status: this.statusFilter,
     };
     const [assessments, evolutions] = await Promise.all([
       this.service.assessments(filters),
@@ -123,11 +122,6 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
   clearDateFilters() {
     this.dateFrom = '';
     this.dateTo = '';
-    void this.feedback.run(() => this.refresh());
-  }
-  changeTab(tab: 'all' | 'in_review') {
-    if (this.activeTab === tab) return;
-    this.activeTab = tab;
     void this.feedback.run(() => this.refresh());
   }
   onPatientFilterChange(patientId: number | null) {
@@ -157,10 +151,6 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
       replaceUrl: true,
     });
     void this.feedback.run(() => this.refresh());
-  }
-  private currentStatusFilter(): ClinicalRecordStatus | '' {
-    if (this.activeTab === 'in_review') return 'in_review';
-    return this.statusFilter;
   }
   statusLabel(status: ClinicalRecordStatus) {
     return {
