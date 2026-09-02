@@ -8,16 +8,71 @@
     ◉ Iniciar avaliação
   </button>
 </section>
-<div class="toolbar">
-  <div class="input-wrap">
-    <span>⌕</span><input placeholder="Buscar paciente" [(ngModel)]="search" />
+<section class="records-filter-panel">
+  <div class="records-tabs" aria-label="Visão dos registros">
+    <button
+      type="button"
+      [class.active]="activeTab === 'all'"
+      (click)="changeTab('all')"
+    >
+      Todas
+    </button>
+    <button
+      type="button"
+      [class.active]="activeTab === 'in_review'"
+      (click)="changeTab('in_review')"
+    >
+      Em revisão
+    </button>
   </div>
-  <select class="filter-select" [(ngModel)]="typeFilter">
-    <option value="all">Todos os registros</option>
-    <option value="initial_assessment">Avaliações iniciais</option>
-    <option value="evolution">Evoluções</option>
-  </select>
-</div>
+
+  <div class="records-filters">
+    <div class="records-filter-field patient-filter-field">
+      <label>Paciente</label>
+      <app-patient-select
+        name="records-patient"
+        [ngModel]="patientId"
+        (ngModelChange)="onPatientFilterChange($event)"
+      />
+    </div>
+    <div class="records-filter-field">
+      <label>Tipo</label>
+      <select class="filter-select" [(ngModel)]="typeFilter">
+        <option value="all">Todos os registros</option>
+        <option value="initial_assessment">Avaliações iniciais</option>
+        <option value="evolution">Evoluções</option>
+      </select>
+    </div>
+    <div class="records-filter-field">
+      <label>Status</label>
+      <select
+        class="filter-select"
+        [disabled]="activeTab === 'in_review'"
+        [ngModel]="activeTab === 'in_review' ? 'in_review' : statusFilter"
+        (ngModelChange)="onStatusFilterChange($event)"
+      >
+        <option value="">Todos os status</option>
+        <option value="pending">Processando</option>
+        <option value="in_review">Em revisão</option>
+        <option value="completed">Concluído</option>
+        <option value="failed">Falha no processamento</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
+    </div>
+    <div class="records-filter-field">
+      <label>Data inicial</label>
+      <input class="form-control" type="date" name="records-date-from" [(ngModel)]="dateFrom" />
+    </div>
+    <div class="records-filter-field">
+      <label>Data final</label>
+      <input class="form-control" type="date" name="records-date-to" [(ngModel)]="dateTo" />
+    </div>
+    <div class="records-filter-actions">
+      <button class="secondary-button" type="button" (click)="applyDateFilters()">Filtrar</button>
+      <button class="secondary-button" type="button" (click)="clearFilters()">Limpar</button>
+    </div>
+  </div>
+</section>
 <section class="panel data-table">
   <div class="table-scroll">
     <table>

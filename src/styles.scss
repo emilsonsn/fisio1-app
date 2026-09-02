@@ -794,6 +794,19 @@ app-auth-art {
   .permission-options {
     max-height: 240px;
   }
+
+  .records-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .records-filter-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .records-filter-actions .secondary-button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 560px) {
@@ -813,6 +826,17 @@ app-auth-art {
 
   .delete-group-dialog .form-actions {
     display: grid;
+  }
+
+  .records-filter-panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .records-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
   }
 }
 .patient-avatar {
@@ -1421,6 +1445,91 @@ app-auth-art {
     line-height: 1.5;
   }
 }
+.records-filter-panel {
+  margin: 0 0 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.records-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.records-tabs button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.records-tabs button.active {
+  color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 6px 16px rgba(3, 30, 52, 0.08);
+}
+
+.records-filters {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.5fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) 150px 150px auto;
+  align-items: start;
+  gap: 14px;
+}
+
+.records-filter-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.records-filter-field label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.records-filter-field .filter-select,
+.records-filter-field .form-control {
+  width: 100%;
+  min-height: 46px;
+}
+
+.records-filter-field .filter-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.patient-filter-field app-patient-select {
+  display: block;
+  min-width: 0;
+}
+
+.records-filter-actions {
+  display: flex;
+  align-items: end;
+  align-self: end;
+  gap: 8px;
+}
+
+.records-filter-actions .secondary-button {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;

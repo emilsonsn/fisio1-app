@@ -1,18 +1,35 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../api-url';
 import { toFormData } from '../form-data';
-import { ApiCollection, Assessment, Evolution } from '../models';
+import { ApiCollection, Assessment, ClinicalRecordStatus, Evolution } from '../models';
+
+export interface ClinicalRecordListFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  patientId?: number | null;
+  perPage?: number;
+  search?: string;
+  status?: ClinicalRecordStatus | '';
+}
 
 @Injectable({ providedIn: 'root' })
 export class ClinicalRecordsService {
   constructor(private readonly http: HttpClient) {}
-  assessments() {
-    return firstValueFrom(this.http.get<ApiCollection<Assessment>>(`${API_URL}/assessments`));
+  assessments(filters: ClinicalRecordListFilters = {}) {
+    return firstValueFrom(
+      this.http.get<ApiCollection<Assessment>>(`${API_URL}/assessments`, {
+        params: this.listParams(filters),
+      }),
+    );
   }
-  evolutions() {
-    return firstValueFrom(this.http.get<ApiCollection<Evolution>>(`${API_URL}/evolutions`));
+  evolutions(filters: ClinicalRecordListFilters = {}) {
+    return firstValueFrom(
+      this.http.get<ApiCollection<Evolution>>(`${API_URL}/evolutions`, {
+        params: this.listParams(filters),
+      }),
+    );
   }
   assessment(id: number) {
     return firstValueFrom(this.http.get<{ data: Assessment }>(`${API_URL}/assessments/${id}`));
@@ -99,5 +116,16 @@ export class ClinicalRecordsService {
         {},
       ),
     );
+  }
+  private listParams(filters: ClinicalRecordListFilters): HttpParams {
+    let params = new HttpParams();
+    const search = filters.search?.trim();
+    if (filters.dateFrom) params = params.set('date_from', filters.dateFrom);
+    if (filters.dateTo) params = params.set('date_to', filters.dateTo);
+    if (filters.patientId) params = params.set('patient_id', filters.patientId);
+    if (filters.perPage) params = params.set('per_page', filters.perPage);
+    if (search) params = params.set('search', search);
+    if (filters.status) params = params.set('status', filters.status);
+    return params;
   }
 }
