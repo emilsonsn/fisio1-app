@@ -13,7 +13,7 @@
                 : isCancelled()
                   ? 'Registro cancelado'
                   : isCompleted()
-                    ? canEditRecord()
+                    ? canActuallyEdit()
                       ? 'Editar registro'
                       : 'Visualizar registro'
                     : 'Revisão do registro'
@@ -30,7 +30,7 @@
                 : isCancelled()
                   ? 'Consulte os dados preservados deste registro.'
                   : isCompleted()
-                    ? canEditRecord()
+                    ? canActuallyEdit()
                       ? 'Atualize os campos necessários e salve as alterações.'
                       : 'Consulte os dados preenchidos neste registro.'
                     : 'Revise e ajuste os campos antes de confirmar.'
@@ -145,7 +145,7 @@
             <strong>Registro concluído</strong>
             <p>
               {{
-                canEditRecord()
+                canActuallyEdit()
                   ? 'Faça os ajustes necessários. Todas as alterações ficarão na auditoria.'
                   : 'Este registro está disponível somente para consulta.'
               }}
@@ -214,8 +214,21 @@
           <div class="attachment-list existing-attachment-list">
             @for (attachment of attachments(); track attachment.id) {
               <span class="attachment-chip">
-                <button type="button" (click)="downloadAttachment(attachment)">
+                <button
+                  type="button"
+                  class="attachment-view-action"
+                  title="Visualizar anexo"
+                  (click)="openPreview(attachment)"
+                >
                   ⌕ {{ attachment.name }}
+                </button>
+                <button
+                  type="button"
+                  class="attachment-download-action"
+                  title="Baixar anexo"
+                  (click)="downloadAttachment(attachment)"
+                >
+                  ⇩
                 </button>
                 @if (!isReadOnly()) {
                   <button type="button" (click)="removeAttachment(attachment.id)">×</button>
@@ -243,5 +256,32 @@
         }
       </div>
     </form>
+  }
+  @if (previewAttachment(); as attachment) {
+    <div class="modal-backdrop" (click)="closePreview()">
+      <div class="modal attachment-preview-modal" (click)="$event.stopPropagation()">
+        <button type="button" class="modal-close" (click)="closePreview()">×</button>
+        <h2>{{ attachment.name }}</h2>
+        <div class="attachment-preview-body">
+          @if (previewLoading()) {
+            <div class="attachment-preview-loading"><i class="inline-spinner"></i> Carregando anexo…</div>
+          } @else if (previewKind() === 'image') {
+            <img [src]="previewObjectUrl()" [alt]="attachment.name" />
+          } @else if (previewKind() === 'pdf') {
+            <iframe [src]="previewSafeUrl()" [title]="attachment.name"></iframe>
+          } @else {
+            <div class="attachment-preview-unsupported">
+              <p>Não é possível pré-visualizar este tipo de arquivo. Baixe para abrir.</p>
+            </div>
+          }
+        </div>
+        <div class="form-actions">
+          <button type="button" class="secondary-button" (click)="closePreview()">Fechar</button>
+          <button type="button" class="primary-button" (click)="downloadAttachment(attachment)">
+            ⇩ Baixar
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </div>

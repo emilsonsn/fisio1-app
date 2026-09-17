@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../core/auth/auth.service';
 import { ClinicalRecordsService } from '../../core/clinical-records/clinical-records.service';
 import { formatDateBr } from '../../core/date-format';
@@ -34,7 +35,7 @@ import { EvolutionFieldsComponent } from './evolution-fields.component';
   ],
   templateUrl: './clinical-record-form-page.component.html',
 })
-export class ClinicalRecordFormPageComponent implements OnInit {
+export class ClinicalRecordFormPageComponent implements OnInit, OnDestroy {
   readonly formatDate = formatDateBr;
   readonly selectedPatient = signal<Patient | null>(null);
   readonly step = signal<1 | 2 | 3 | 4>(1);
@@ -42,17 +43,26 @@ export class ClinicalRecordFormPageComponent implements OnInit {
   readonly attachments = signal<RecordAttachment[]>([]);
   readonly savedCancellationReason = signal<string | null>(null);
   readonly canEditRecord = signal(false);
+  readonly viewOnly = signal(false);
+  readonly previewAttachment = signal<RecordAttachment | null>(null);
+  readonly previewLoading = signal(false);
+  readonly previewKind = signal<'image' | 'pdf' | 'other' | null>(null);
+  readonly previewObjectUrl = signal<string | null>(null);
+  readonly previewSafeUrl = signal<SafeResourceUrl | null>(null);
   form: ClinicalRecordForm = emptyClinicalRecordForm();
   files: File[] = [];
   private recordId: number | null = null;
+  private previewBlobUrl: string | null = null;
   constructor(
     private readonly records: ClinicalRecordsService,
     private readonly feedback: FeedbackService,
     private readonly auth: AuthService,
+    private readonly sanitizer: DomSanitizer,
     private readonly route: ActivatedRoute,
     readonly router: Router,
   ) {}
   async ngOnInit() {
+    this.viewOnly.set(this.route.snapshot.data['viewOnly'] === true);
     await this.feedback.run(async () => {
       const patientId = Number(this.route.snapshot.queryParamMap.get('patient') ?? 0);
       const recordId = Number(
@@ -124,7 +134,10 @@ export class ClinicalRecordFormPageComponent implements OnInit {
     return this.recordStatus() === 'completed';
   }
   isReadOnly() {
-    return this.isCancelled() || !this.canEditRecord();
+    return this.viewOnly() || this.isCancelled() || !this.canEditRecord();
+  }
+  canActuallyEdit() {
+    return this.canEditRecord() && !this.viewOnly();
   }
   async removeAttachment(id: number) {
     if (this.isReadOnly()) return;
@@ -147,6 +160,47 @@ export class ClinicalRecordFormPageComponent implements OnInit {
       link.click();
       URL.revokeObjectURL(url);
     });
+  }
+  async openPreview(attachment: RecordAttachment) {
+    this.previewAttachment.set(attachment);
+    this.previewLoading.set(true);
+    this.previewKind.set(null);
+    const loaded = await this.feedback.run(async () => {
+      const blob = await this.records.downloadAttachment(attachment.id);
+      this.setPreviewBlob(attachment, blob);
+      return true;
+    });
+    this.previewLoading.set(false);
+    if (!loaded) this.closePreview();
+  }
+  closePreview() {
+    this.previewAttachment.set(null);
+    this.previewKind.set(null);
+    this.previewSafeUrl.set(null);
+    this.previewObjectUrl.set(null);
+    this.revokePreviewUrl();
+  }
+  ngOnDestroy() {
+    this.revokePreviewUrl();
+  }
+  private setPreviewBlob(attachment: RecordAttachment, blob: Blob) {
+    this.revokePreviewUrl();
+    const url = URL.createObjectURL(blob);
+    this.previewBlobUrl = url;
+    this.previewObjectUrl.set(url);
+    if (attachment.mime_type.startsWith('image/')) {
+      this.previewKind.set('image');
+    } else if (attachment.mime_type === 'application/pdf') {
+      this.previewKind.set('pdf');
+      this.previewSafeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    } else {
+      this.previewKind.set('other');
+    }
+  }
+  private revokePreviewUrl() {
+    if (!this.previewBlobUrl) return;
+    URL.revokeObjectURL(this.previewBlobUrl);
+    this.previewBlobUrl = null;
   }
   patientName() {
     return this.selectedPatient()?.name ?? '';

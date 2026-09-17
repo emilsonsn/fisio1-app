@@ -60,6 +60,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'records/:type/:id/view',
+        canActivate: [clinicalRecordsViewGuard],
+        data: { viewOnly: true },
+        loadComponent: () =>
+          import('./features/clinical-records/clinical-record-form-page.component').then(
+            (module) => module.ClinicalRecordFormPageComponent,
+          ),
+      },
+      {
         path: 'records',
         canActivate: [clinicalRecordsViewGuard],
         loadComponent: () =>

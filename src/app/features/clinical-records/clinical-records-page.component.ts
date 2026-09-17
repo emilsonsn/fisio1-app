@@ -164,6 +164,9 @@ export class ClinicalRecordsPageComponent implements OnInit, OnDestroy {
   async open(row: RecordRow) {
     await this.router.navigate(['/records', row.type, row.id, 'edit']);
   }
+  async openView(row: RecordRow) {
+    await this.router.navigate(['/records', row.type, row.id, 'view']);
+  }
   async review(row: RecordRow) {
     await this.open(row);
   }

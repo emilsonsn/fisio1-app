@@ -113,18 +113,19 @@
             <td>
               <div class="table-actions">
                 @if (row.status === 'in_review') {
-                  <button [class.review-action]="canEdit(row)" (click)="review(row)">
-                    {{ canEdit(row) ? 'Revisar' : 'Ver' }}
-                  </button>
+                  <button title="Visualizar registro" (click)="openView(row)">›</button>
+                  @if (canEdit(row)) {
+                    <button class="review-action" title="Revisar registro" (click)="review(row)">
+                      Revisar
+                    </button>
+                  }
                 } @else if (row.status === 'failed' && row.process) {
                   <button class="retry-action" (click)="retry(row.process.id)">↻</button>
                 } @else if (row.status === 'completed') {
-                  <button
-                    [title]="canEdit(row) ? 'Editar registro' : 'Visualizar registro'"
-                    (click)="open(row)"
-                  >
-                    {{ canEdit(row) ? '✎' : '›' }}
-                  </button>
+                  <button title="Visualizar registro" (click)="openView(row)">›</button>
+                  @if (canEdit(row)) {
+                    <button title="Editar registro" (click)="open(row)">✎</button>
+                  }
                 } @else if (row.status === 'cancelled') {
                   <button title="Visualizar registro cancelado" (click)="open(row)">›</button>
                 } @else {
