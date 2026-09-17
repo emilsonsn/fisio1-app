@@ -1571,6 +1571,20 @@ app-auth-art {
   border-radius: 50%;
   animation: clinical-spin 0.8s linear infinite;
 }
+.table-actions .view-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.table-actions .view-action svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
 .table-actions .review-action {
   width: auto;
   min-width: 72px;

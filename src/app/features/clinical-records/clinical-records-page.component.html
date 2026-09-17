@@ -113,7 +113,12 @@
             <td>
               <div class="table-actions">
                 @if (row.status === 'in_review') {
-                  <button title="Visualizar registro" (click)="openView(row)">›</button>
+                  <button class="view-action" title="Visualizar registro" (click)="openView(row)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
                   @if (canEdit(row)) {
                     <button class="review-action" title="Revisar registro" (click)="review(row)">
                       Revisar
@@ -122,12 +127,26 @@
                 } @else if (row.status === 'failed' && row.process) {
                   <button class="retry-action" (click)="retry(row.process.id)">↻</button>
                 } @else if (row.status === 'completed') {
-                  <button title="Visualizar registro" (click)="openView(row)">›</button>
+                  <button class="view-action" title="Visualizar registro" (click)="openView(row)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
                   @if (canEdit(row)) {
                     <button title="Editar registro" (click)="open(row)">✎</button>
                   }
                 } @else if (row.status === 'cancelled') {
-                  <button title="Visualizar registro cancelado" (click)="open(row)">›</button>
+                  <button
+                    class="view-action"
+                    title="Visualizar registro cancelado"
+                    (click)="open(row)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
                 } @else {
                   <button disabled><i class="inline-spinner"></i></button>
                 }
